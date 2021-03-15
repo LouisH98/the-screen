@@ -1,9 +1,9 @@
 [Core]
-Name = Demo
-Module = demo
+Name = Red Noise
+Module = RandomRed
 
 [Documentation]
 Author = Louis Holdsworth
 Version = 0.1
 Website = My very own website
-Description = Demo for unicorn controller
+Description = My first plugin

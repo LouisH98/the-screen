@@ -1,0 +1,12 @@
+[Core]
+Name = RainbowSearch
+Module = RainbowSearch
+
+[Documentation]
+Author = Louis Holdsworth
+Version = 0.1
+Website = My very own website
+Description = Demo for unicorn controller
+
+[Config]
+duration = 200

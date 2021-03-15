@@ -1,0 +1,9 @@
+[Core]
+Name = Stars
+Module = stars
+
+[Documentation]
+Author = Louis Holdsworth
+Version = 0.1
+Website = louisholdsworth.co.uk
+Description = Pretty AA'd stars
