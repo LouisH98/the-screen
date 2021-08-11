@@ -72,8 +72,9 @@ def main():
                         for x in range(width):
                             for y in range(height):
                                 if slide.use_pixels:
-                                    r, g, b = slide.get_pixel(x, y, i)
-                                    unicornhathd.set_pixel(x, y, r, g, b)
+                                    pixel = slide.get_pixel(x, y, i)
+                                    # print(f"x:{pixel.x}, y: {pixel.x}")
+                                    unicornhathd.set_pixel(pixel.x, pixel.y, pixel.r, pixel.g, pixel.b)
                                 else:
                                     pixel = buffer[x][y]
                                     unicornhathd.set_pixel(pixel.x, pixel.y, pixel.r, pixel.g, pixel.b)

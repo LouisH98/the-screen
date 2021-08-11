@@ -1,0 +1,9 @@
+[Core]
+Name = CheckerBoard
+Module = CheckerBoard
+
+[Documentation]
+Author = Louis Holdsworth
+Version = 0.1
+Website = My very own website
+Description = My first plugin

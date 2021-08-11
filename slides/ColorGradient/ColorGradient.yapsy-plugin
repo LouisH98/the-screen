@@ -1,0 +1,9 @@
+[Core]
+Name = ColorGradient
+Module = ColorGradient
+
+[Documentation]
+Author = Louis Holdsworth
+Version = 0.1
+Website = My very own website
+Description = A color gradient

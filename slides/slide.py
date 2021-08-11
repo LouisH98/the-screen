@@ -20,6 +20,5 @@ class BaseSlide(IPlugin):
         return Pixel(x, y, 0, 0, 255)
 
 
-    @classmethod
-    def get_buffer(cls):
+    def get_buffer(self):
         pass

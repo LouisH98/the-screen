@@ -1,7 +1,7 @@
 import math
 
 from pixel import Pixel
-from utils import clamp_pixel
+from utils import clamp
 import slides.slide as base
 
 
@@ -15,9 +15,11 @@ def rainbow_search(x, y, step):
     b = math.sin((x + ys) * scale) + math.cos((y + ys) * scale)
     return (r * 255, g * 255, b * 255)
 
-
 class Demo(base.BaseSlide):
     def get_pixel(self, x, y, iter):
         r, g, b = rainbow_search(x, y, iter)
-        pixel = clamp_pixel(Pixel(x, y, r, g, b))
-        return pixel
+        r = clamp(r)
+        g = clamp(g)
+        b = clamp(b)
+        return r, g, b
+
