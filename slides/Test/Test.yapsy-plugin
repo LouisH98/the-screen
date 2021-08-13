@@ -1,9 +1,9 @@
 [Core]
-Name = ColorGradient
-Module = ColorGradient
+Name = Test
+Module = Test
 
 [Documentation]
 Author = Louis Holdsworth
 Version = 0.1
 Website = louisholdsworth.co.uk
-Description = A color gradient
+Description = For testing!

@@ -41,7 +41,7 @@ class UnicornAA:
         unicorn.show()
 
     def getPixels(self):
-        pixel_obj_array = [[Pixel(x, y) for x in range(16)] for y in range(16)]
+        rgb_array = [[[0, 0, 0] for _ in range(16)] for y in range(16)]
         for y in range(0, 16):
             for x in range(0, 16):
                 # loop through the subpixel grid for this pixel
@@ -52,12 +52,11 @@ class UnicornAA:
                         g += self.grid[sx][sy][1]
                         b += self.grid[sx][sy][2]
                 # set the pixel's color to the average of the subpixels
-                pixel = pixel_obj_array[x][y]
-                pixel.r = round(r / self.oversample ** 2)
-                pixel.g = round(g / self.oversample ** 2)
-                pixel.b = round(b / self.oversample ** 2)
+                rgb_array[x][y][0] = r / self.oversample ** 2
+                rgb_array[x][y][1] = g / self.oversample ** 2
+                rgb_array[x][y][2] = b / self.oversample ** 2
 
-        return pixel_obj_array
+        return rgb_array
 
     # render the subpixel grid to stdout as "ascii art" (for testing)
     def renderGridAscii(self):
@@ -97,7 +96,7 @@ class UnicornAA:
     def drawRect(self, x, y, w, h, r, g, b):
         for i in range(0, w):
             for j in range(0, h):
-                self.setPixel(int(x) + int(i), int(y) + int(j), r, g, b)
+                self.setPixel(x + i, y + j, r, g, b)
 
     # draw a circle
     def drawCircle(self, x, y, radius, r, g, b):

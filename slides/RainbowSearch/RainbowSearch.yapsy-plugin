@@ -5,7 +5,7 @@ Module = RainbowSearch
 [Documentation]
 Author = Louis Holdsworth
 Version = 0.1
-Website = My very own website
+Website = louisholdsworth.co.uk
 Description = Demo for unicorn controller
 
 [Config]

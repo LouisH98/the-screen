@@ -1,10 +1,7 @@
 #!/usr/bin/env python3 
 import unicornhathd
-from os.path import dirname, basename, isfile, join
-import glob
 from yapsy.PluginManager import PluginManager
 import time
-from pixel import Pixel
 import json
 
 current_brightness = 0.6
@@ -52,13 +49,17 @@ step = 1
 
 slides = load_slides()
 
+print("Starting Slides...")
+
 def main():
     last_loop = time.time()
     current_frames = 0
     if len(slides) > 0:
         try:
+
             while True:
                 for slide in slides:
+                    print(slide.name, end="\r")
                     slide = slide.plugin_object
                     slide.init(width, height)
                     for i in range(0, length, step):
@@ -68,15 +69,16 @@ def main():
                             last_loop = time.time()
 
                         unicornhathd.clear()
-                        buffer = slide.get_buffer()
+                        if not slide.use_pixels:
+                            buffer = slide.get_buffer()
                         for x in range(width):
                             for y in range(height):
                                 if slide.use_pixels:
                                     r, g, b = slide.get_pixel(x, y, i)
                                     unicornhathd.set_pixel(x, y, r, g, b)
                                 else:
-                                    pixel = buffer[x][y]
-                                    unicornhathd.set_pixel(pixel.x, pixel.y, pixel.r, pixel.g, pixel.b)
+                                    r, g, b = buffer[x][y]
+                                    unicornhathd.set_pixel(x, y, r, g, b)
 
                         unicornhathd.show()
                         current_frames += 1
