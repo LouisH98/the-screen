@@ -1,9 +1,0 @@
-[Core]
-Name = Test
-Module = Test
-
-[Documentation]
-Author = Louis Holdsworth
-Version = 0.1
-Website = louisholdsworth.co.uk
-Description = For testing!

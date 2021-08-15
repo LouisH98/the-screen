@@ -1,9 +1,12 @@
 [Core]
-Name = Heart
-Module = Heart
+Name = GameOfLife
+Module = GameOfLife
 
 [Documentation]
 Author = Louis Holdsworth
 Version = 0.1
 Website = louisholdsworth.co.uk
-Description = It beats...
+Description = It's alive!
+
+[Config]
+duration = 200

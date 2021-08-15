@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
 import math
-import unicornhathd as unicorn
-from pixel import Pixel
+try:
+    import unicornhathd as unicorn
+except ImportError:
+    from unicorn_hat_sim import unicornhathd as unicorn
+
 
 class UnicornAA:
     oversample = 2
@@ -14,7 +17,6 @@ class UnicornAA:
         self.size = 16 * self.oversample
         self.initGrid()
         # fire up the unicorn hat
-        unicorn.set_layout(unicorn.HAT)
         unicorn.rotation(90)
         unicorn.brightness(1)
         self.width, self.height = unicorn.get_shape()

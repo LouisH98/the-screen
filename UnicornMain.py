@@ -1,5 +1,11 @@
-#!/usr/bin/env python3 
-import unicornhathd
+#!/usr/bin/env python3
+from utils import clamp
+
+try:
+    import unicornhathd
+except ImportError:
+    from unicorn_hat_sim import unicornhathd
+
 from yapsy.PluginManager import PluginManager
 import time
 import json
@@ -56,7 +62,6 @@ def main():
     current_frames = 0
     if len(slides) > 0:
         try:
-
             while True:
                 for slide in slides:
                     print(slide.name, end="\r")
@@ -67,7 +72,6 @@ def main():
                             print("⚡ FPS: " + str(current_frames), end='\r')
                             current_frames = 0
                             last_loop = time.time()
-
                         unicornhathd.clear()
                         if not slide.use_pixels:
                             buffer = slide.get_buffer()
@@ -75,11 +79,11 @@ def main():
                             for y in range(height):
                                 if slide.use_pixels:
                                     r, g, b = slide.get_pixel(x, y, i)
-                                    unicornhathd.set_pixel(x, y, r, g, b)
+                                    unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                                 else:
                                     r, g, b = buffer[x][y]
                                     unicornhathd.set_pixel(x, y, r, g, b)
-
+                                    # unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                         unicornhathd.show()
                         current_frames += 1
         except KeyboardInterrupt:

@@ -1,8 +1,4 @@
-from pixel import Pixel
 import slides.slide as base
-import numpy
-from math import *
-from utils import normalise
 import time
 
 class CheckerBoard(base.BaseSlide):
