@@ -1,4 +1,4 @@
 {
-  "enable_all": true,
-  "enabled": ["GameOfLife"]
+  "enable_all": false,
+  "enabled": ["CheckerBoard"]
 }

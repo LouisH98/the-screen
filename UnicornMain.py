@@ -10,7 +10,7 @@ from yapsy.PluginManager import PluginManager
 import time
 import json
 
-current_brightness = 0.6
+current_brightness = 0.4
 current_slide_index = 0
 
 width, height = unicornhathd.get_shape()
@@ -64,7 +64,6 @@ def main():
         try:
             while True:
                 for slide in slides:
-                    print(slide.name, end="\r")
                     slide = slide.plugin_object
                     slide.init(width, height)
                     for i in range(0, length, step):
