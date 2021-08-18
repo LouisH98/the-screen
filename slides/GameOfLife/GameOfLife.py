@@ -1,8 +1,7 @@
-import random
 import time
-
 import slides.slide as base
 import numpy as np
+from operator import eq
 
 ALIVE = [255, 255, 255]
 DEAD = [0, 0, 0]
@@ -10,32 +9,6 @@ DEAD = [0, 0, 0]
 
 def get_random_grid(width, height):
     return np.random.randint(2, size=(width, height))
-    # grid = [[[] for x in range(0, width)] for y in range(0, height)]
-    # for x in range(0, width):
-    #     for y in range(0, height):
-    #         if random.random() > 0.5:
-    #             grid[x][y] = 1
-    #         else:
-    #             grid[x][y] = 0
-    # return grid
-
-
-glider = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
 
 ###
@@ -51,12 +24,15 @@ class GameOfLife(base.BaseSlide):
         self.use_pixels = False
         self.grid = []
         self.new_grid = []
+        self.history = []
+        self.repeat_count = 0
+        self.max_repeat_count = 5
 
     def init(self, width, height):
         super().init(width, height)
         self.grid = get_random_grid(width, height)
-        # self.grid = np.asarray(glider)
-        self.new_grid = self.grid.copy()
+        self.history = []
+        self.repeat_count = 0
 
     def get_neighbour_count(self, grid, x, y):
         count = 0
@@ -82,22 +58,30 @@ class GameOfLife(base.BaseSlide):
 
     def convert_to_rgb(self, grid):
         # rgb_grid = [[[] for x in range(0, self.width)] for y in range(0, self.height)]
-        rgb_grid = [[0] * self.width for i in range(self.height)]
-        for x in range(0, self.width):
-            for y in range(0, self.height):
-                if grid[x][y] == 1:
-                    rgb_grid[x][y] = ALIVE
-                else:
-                    rgb_grid[x][y] = DEAD
-
+        rgb_grid = [[0, 0, 0] * self.width for i in range(self.height)]
+        if len(self.history) > 1:
+            history = self.history[1]
+            for x in range(0, self.width):
+                for y in range(0, self.height):
+                    if history[x][y] == 0 and grid[x][y] == 1:
+                        rgb_grid[x][y] = [0, 255, 0]
+                    elif grid[x][y] == 1:
+                        rgb_grid[x][y] = ALIVE
+                    else:
+                        rgb_grid[x][y] = DEAD
+        else:
+            for x in range(0, self.width):
+                for y in range(0, self.height):
+                    if grid[x][y] == 1:
+                        rgb_grid[x][y] = ALIVE
+                    else:
+                        rgb_grid[x][y] = DEAD
         return rgb_grid
 
     def do_generation(self):
         self.new_grid = self.grid.copy()
-
         for x in range(0, self.width):
             for y in range(0, self.height):
-                # neighbour_count = self.get_neighbour_count(self.grid, x, y)
                 neighbour_count = self.get_neighbour_fast(self.grid, x, y)
 
                 # if cell is alive
@@ -116,14 +100,23 @@ class GameOfLife(base.BaseSlide):
                     if neighbour_count == 3:
                         self.new_grid[x][y] = 1
 
+        # Check for only still life
         if np.array_equal(self.grid, self.new_grid):
             self.init(self.width, self.height)
             time.sleep(1)
         else:
+            # check for repeaters
+            self.history.append(self.grid)
             self.grid = self.new_grid.copy()
+            if len(self.history) > 2:
+                self.history.pop(0)
+            if all(map(eq, self.grid.flat, self.history[0].flat)):
+                self.repeat_count += 1
+                if self.repeat_count > self.max_repeat_count:
+                    self.init(self.width, self.height)
+                    time.sleep(1)
 
     def get_buffer(self):
-
         self.do_generation()
         converted = self.convert_to_rgb(self.grid)
 
