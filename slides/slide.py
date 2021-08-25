@@ -9,6 +9,8 @@ class BaseSlide(IPlugin):
         self.width = 0
         self.buffer = []
         self.use_pixels = True
+        self.done = False
+        self.length = 250
 
     def init(self, width, height):
         self.height = width

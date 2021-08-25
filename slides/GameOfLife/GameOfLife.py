@@ -25,14 +25,24 @@ class GameOfLife(base.BaseSlide):
         self.grid = []
         self.new_grid = []
         self.history = []
+        self.length = 300
+
+        # how many generations 2x repeaters are allowed to carry on for
+        # game will reset after repeat_count >= max_repeat_count
         self.repeat_count = 0
-        self.max_repeat_count = 5
+        self.max_repeat_count = 20
+
+        # how many times can we run the game?
+        self.max_num_iterations = 2
+        self.current_iteration_count = 0
 
     def init(self, width, height):
         super().init(width, height)
         self.grid = get_random_grid(width, height)
         self.history = []
         self.repeat_count = 0
+        self.current_iteration_count = 0
+        self.done = False
 
     def get_neighbour_count(self, grid, x, y):
         count = 0
@@ -63,9 +73,15 @@ class GameOfLife(base.BaseSlide):
             history = self.history[1]
             for x in range(0, self.width):
                 for y in range(0, self.height):
-                    if history[x][y] == 0 and grid[x][y] == 1:
-                        rgb_grid[x][y] = [0, 255, 0]
-                    elif grid[x][y] == 1:
+                    cell = grid[x][y]
+                    # Cell has come alive
+                    if history[x][y] == 0 and cell == 1:
+                        rgb_grid[x][y] = [42, 252, 152]
+                    # Cell has died
+                    elif history[x][y] == 1 and cell == 0:
+                        rgb_grid[x][y] = [25, 100, 200]
+                    # Cell has continued living
+                    elif cell == 1:
                         rgb_grid[x][y] = ALIVE
                     else:
                         rgb_grid[x][y] = DEAD
@@ -103,6 +119,7 @@ class GameOfLife(base.BaseSlide):
         # Check for only still life
         if np.array_equal(self.grid, self.new_grid):
             self.init(self.width, self.height)
+            self.current_iteration_count += 1
             time.sleep(1)
         else:
             # check for repeaters
@@ -114,10 +131,13 @@ class GameOfLife(base.BaseSlide):
                 self.repeat_count += 1
                 if self.repeat_count > self.max_repeat_count:
                     self.init(self.width, self.height)
-                    time.sleep(1)
+                    self.current_iteration_count += 1
 
     def get_buffer(self):
         self.do_generation()
         converted = self.convert_to_rgb(self.grid)
+
+        if self.current_iteration_count >= self.max_num_iterations:
+            self.done = True
 
         return converted

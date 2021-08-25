@@ -50,7 +50,6 @@ def load_slides():
     return slides
 
 
-length = 200
 step = 1
 
 slides = load_slides()
@@ -60,20 +59,30 @@ print("Starting Slides...")
 def main():
     last_loop = time.time()
     current_frames = 0
+    i = 0
     if len(slides) > 0:
         try:
             while True:
                 for slide in slides:
                     slide = slide.plugin_object
                     slide.init(width, height)
-                    for i in range(0, length, step):
+                    i = 0
+                    while True:
+                        i += 1
                         if time.time() - last_loop > 1:
                             print("⚡ FPS: " + str(current_frames), end='\r')
                             current_frames = 0
                             last_loop = time.time()
+
                         unicornhathd.clear()
+
                         if not slide.use_pixels:
                             buffer = slide.get_buffer()
+
+                        # Break out of loop if the slide is done, or iteration limit exceeded
+                        if slide.done or i >= slide.length:
+                            break
+
                         for x in range(width):
                             for y in range(height):
                                 if slide.use_pixels:
