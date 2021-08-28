@@ -1,0 +1,10 @@
+[Core]
+Name = Matrix
+Module = Matrix
+
+[Documentation]
+Author = Louis Holdsworth
+Version = 0.1
+Website = louisholdsworth.co.uk
+Description = Take the pill
+
