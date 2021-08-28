@@ -1,0 +1,12 @@
+[Core]
+Name = PONG
+Module = PONG
+
+[Documentation]
+Author = Louis Holdsworth
+Version = 0.1
+Website = louisholdsworth.co.uk
+Description = Ping pong
+
+[Config]
+duration = 500
