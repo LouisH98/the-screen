@@ -1,4 +1,4 @@
 {
   "enable_all": false,
-  "enabled": ["GameOfLife"]
+  "enabled": ["PONG"]
 }

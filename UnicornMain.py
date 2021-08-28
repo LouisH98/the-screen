@@ -10,7 +10,7 @@ from yapsy.PluginManager import PluginManager
 import time
 import json
 
-current_brightness = 0.4
+current_brightness = 0.6
 current_slide_index = 0
 
 width, height = unicornhathd.get_shape()
@@ -56,10 +56,10 @@ slides = load_slides()
 
 print("Starting Slides...")
 
+
 def main():
     last_loop = time.time()
     current_frames = 0
-    i = 0
     if len(slides) > 0:
         try:
             while True:

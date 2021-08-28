@@ -52,7 +52,7 @@ class Paddle(GameObject):
         self.center = round(game.height / 2)
 
     def update(self):
-        puck = self.game.game_objects[0]
+        puck = self.game.game_objects[-1]
 
         # check if puck is moving towards this paddle
         if self.x == 0 and puck.velocity[0] < 0:
@@ -101,9 +101,13 @@ class Puck(GameObject):
         future_x = self.x + self.velocity[0]
         future_y = self.y + self.velocity[1]
 
-        if future_x >= self.game.width - 1 or future_x < 0:
+        # hit edge (or paddle... ;))
+        if future_x > self.game.width - 1 or future_x < 0:
             self.colour = get_random_colour()
+            self.velocity[0] += random.uniform(-0.1, 0.2)
+            self.velocity[1] += random.uniform(0, 0.2)
             self.velocity[0] = self.velocity[0] * -1
+        # bounce off top
         if future_y >= self.game.height - 1 or future_y < 0:
             self.velocity[1] = self.velocity[1] * -1
 
@@ -120,7 +124,7 @@ class Game:
         self.height = height
         self.matrix = numpy.zeros((width, height, 3), dtype=int)
 
-        self.game_objects = [Puck(self), Paddle(self), Paddle(self, (self.width - 1, 0))]
+        self.game_objects = [Paddle(self), Paddle(self, (self.width - 1, 0)), Puck(self)]
 
     def set_pixel(self, x, y, colour):
         self.matrix[x][y] = colour
