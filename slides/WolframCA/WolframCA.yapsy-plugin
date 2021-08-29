@@ -1,0 +1,12 @@
+[Core]
+Name = WolframCA
+Module = WolframCA
+
+[Documentation]
+Author = Louis Holdsworth
+Version = 0.1
+Website = louisholdsworth.co.uk
+Description = It's alive... kinda
+
+[Config]
+duration = 250

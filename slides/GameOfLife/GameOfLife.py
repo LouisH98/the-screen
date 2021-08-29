@@ -33,7 +33,7 @@ class GameOfLife(base.BaseSlide):
         self.max_repeat_count = 20
 
         # how many times can we run the game?
-        self.max_num_iterations = 2
+        self.max_num_iterations = 1
         self.current_iteration_count = 0
 
     def init(self, width, height):

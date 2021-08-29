@@ -67,7 +67,8 @@ def main():
                     slide = slide.plugin_object
                     slide.init(width, height)
                     i = 0
-                    while True:
+                    # Break out of loop if the slide is done, or iteration limit exceeded
+                    while (not slide.done) and i <= slide.length:
                         i += 1
                         if time.time() - last_loop > 1:
                             print("⚡ FPS: " + str(current_frames), end='\r')
@@ -78,10 +79,6 @@ def main():
 
                         if not slide.use_pixels:
                             buffer = slide.get_buffer()
-
-                        # Break out of loop if the slide is done, or iteration limit exceeded
-                        if slide.done or i >= slide.length:
-                            break
 
                         for x in range(width):
                             for y in range(height):

@@ -104,13 +104,17 @@ class Puck(GameObject):
         # hit edge (or paddle... ;))
         if future_x > self.game.width - 1 or future_x < 0:
             self.colour = get_random_colour()
-            self.velocity[0] += random.uniform(-0.1, 0.2)
+            self.velocity[0] += random.uniform(0, 0.2)
             self.velocity[1] += random.uniform(0, 0.2)
             self.velocity[0] = self.velocity[0] * -1
         # bounce off top
         if future_y >= self.game.height - 1 or future_y < 0:
             self.velocity[1] = self.velocity[1] * -1
 
+        # cap Y velocity to paddle max speed
+        paddle_max_speed = self.game.game_objects[1].max_speed
+        self.velocity[1] = min(self.velocity[1], paddle_max_speed)
+        self.velocity[1] = max(self.velocity[1], -paddle_max_speed)
         self.x += self.velocity[0]
         self.y += self.velocity[1]
 
