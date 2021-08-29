@@ -1,3 +1,4 @@
+import colorsys
 import random
 from random import choice
 import slides.slide as base
@@ -11,17 +12,18 @@ def int_to_bin_list(number: int):
 class WolframCA(base.BaseSlide):
     def __init__(self):
         super().__init__()
-        self.current_generation = [random.randint(0, 1) for _ in range(self.width)]
+        self.current_generation = []
         self.rule = []
         self.matrix = []
         self.use_pixels = False
-        self.rules = [90]
+        self.rules = [30, 90, 60]
         self.index = 0
+        self.current_colour = 0
 
     def init(self, width, height):
         self.width = width
         self.height = height
-        self.current_generation = [0, 0, 0, 1, 1, 0, 0, 0]
+        self.current_generation = [0, 0, 0, 0, 1, 0, 0, 0]
         self.matrix = np.zeros((width, height, 3), dtype=int)
         bin_list = int_to_bin_list(choice(self.rules))
         while len(bin_list) < 8:
@@ -35,19 +37,33 @@ class WolframCA(base.BaseSlide):
     def convert_to_rgb(self, generation):
         rgb_gen = [[0, 0, 0] for _ in range(self.width)]
 
+        r, g, b = colorsys.hsv_to_rgb(self.current_colour, 1, 1)
+        self.current_colour += 0.05
+        if self.current_colour >= 1:
+            self.current_colour = 0
+            
         for i in range(len(generation)):
             if generation[i] == 1:
-                rgb_gen[i] = [255, 255, 255]
+                rgb_gen[i] = [r*255, g*255, b*255]
         return rgb_gen
 
     def do_generation(self):
         current_gen = self.current_generation
         new_gen = np.zeros(self.width, dtype=int)
 
-        for i in range(1, len(current_gen) - 1):
-            left = current_gen[i-1]
+        for i in range(len(current_gen)):
             center = current_gen[i]
-            right = current_gen[i + 1]
+
+            if i == 0:
+                left = 0
+                right = current_gen[i + 1]
+
+            elif i == len(current_gen) - 1:
+                left = current_gen[i - 1]
+                right = 0
+            else:
+                left = current_gen[i - 1]
+                right = current_gen[i + 1]
 
             new_gen[i] = self.get_rule_result(left, center, right)
 
@@ -59,6 +75,10 @@ class WolframCA(base.BaseSlide):
             self.index += 1
 
         self.current_generation = new_gen
+
+        if np.sum(self.matrix) == 0:
+            self.init(self.width, self.height)
+
         return self.matrix
 
     def get_buffer(self):

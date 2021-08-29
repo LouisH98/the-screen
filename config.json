@@ -1,4 +1,4 @@
 {
-  "enable_all": true,
+  "enable_all": false,
   "enabled": ["WolframCA"]
 }
