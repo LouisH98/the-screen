@@ -16,7 +16,7 @@ class WolframCA(base.BaseSlide):
         self.rule = []
         self.matrix = []
         self.use_pixels = False
-        self.rules = [30, 90, 60]
+        self.rules = [30, 90, 60, 105, 139]
         self.index = 0
         self.current_colour = 0
 
@@ -41,7 +41,7 @@ class WolframCA(base.BaseSlide):
         self.current_colour += 0.05
         if self.current_colour >= 1:
             self.current_colour = 0
-            
+
         for i in range(len(generation)):
             if generation[i] == 1:
                 rgb_gen[i] = [r*255, g*255, b*255]
