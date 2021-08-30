@@ -27,6 +27,7 @@ log_file_handler = logging.FileHandler('screen.log')
 log_file_handler.setLevel(logging.DEBUG)
 error_log.addHandler(log_file_handler)
 
+
 def init_hat():
     unicornhathd.brightness(current_brightness)
     unicornhathd.clear()
@@ -99,6 +100,7 @@ def main():
         except KeyboardInterrupt:
             unicornhathd.off()
         except Exception as e:
+            unicornhathd.off()
             logging.getLogger(__name__).error("Program crashed. Most likely a slide error: " + str(e))
             global crash_count
             if crash_count < max_crash_count:
