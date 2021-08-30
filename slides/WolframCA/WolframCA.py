@@ -19,7 +19,8 @@ class WolframCA(base.BaseSlide):
         self.rules = [30, 90, 60, 105, 139]
         self.index = 0
         self.current_colour = 0
-
+        self.length = 350
+        
     def init(self, width, height):
         self.width = width
         self.height = height

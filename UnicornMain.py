@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from utils import clamp
 import logging
+import signal
 try:
     import unicornhathd
 except ImportError:
@@ -10,7 +11,6 @@ from yapsy.PluginManager import PluginManager
 import time
 import json
 
-current_brightness = 0.6
 current_slide_index = 0
 
 width, height = unicornhathd.get_shape()
@@ -28,17 +28,14 @@ log_file_handler.setLevel(logging.DEBUG)
 error_log.addHandler(log_file_handler)
 
 
-def init_hat():
-    unicornhathd.brightness(current_brightness)
-    unicornhathd.clear()
-
-
 # check config for slides to load'
 def load_slides():
     slides = []
     with open('config.json') as config_file:
         config = json.load(config_file)
-        if "enable_all" in config and config["enable_all"]:
+        current_brightness = config['brightness']
+        unicornhathd.brightness(current_brightness)
+        if len(config['enabled']) == 0:
             print("👋  Loading all slides")
             for slide in slideManager.getAllPlugins():
                 slideManager.activatePluginByName(slide.name)
@@ -89,7 +86,7 @@ def main():
                         for x in range(width):
                             for y in range(height):
                                 if slide.use_pixels:
-                                    r, g, b = slide.get_pixel(x, y, i)
+                                    r, g, b = slide.get_pixel(x, y, iteration)
                                     unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                                 else:
                                     r, g, b = buffer[x][y]
@@ -101,6 +98,7 @@ def main():
             unicornhathd.off()
         except Exception as e:
             unicornhathd.off()
+            print(e)
             logging.getLogger(__name__).error("Program crashed. Most likely a slide error: " + str(e))
             global crash_count
             if crash_count < max_crash_count:
@@ -109,8 +107,12 @@ def main():
     else:
         print("No slides found. Ensure they are in /slides")
 
+def handlePipe(a, b):
+    print(str(a),str(b))
 
 if __name__ == "__main__":
     # init screen and things
-    init_hat()
+
+    signal.signal(signal.SIGPIPE, handlePipe)
+
     main()
