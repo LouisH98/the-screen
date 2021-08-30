@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from utils import clamp
-
+import logging
 try:
     import unicornhathd
 except ImportError:
@@ -20,6 +20,12 @@ slideManager = PluginManager()
 slideManager.setPluginPlaces(["slides"])
 slideManager.collectPlugins()
 
+# init logging
+error_log = logging.getLogger(__name__)
+error_log.setLevel(logging.ERROR)
+log_file_handler = logging.FileHandler('screen.log')
+log_file_handler.setLevel(logging.DEBUG)
+error_log.addHandler(log_file_handler)
 
 def init_hat():
     unicornhathd.brightness(current_brightness)
@@ -93,6 +99,9 @@ def main():
                         current_frames += 1
         except KeyboardInterrupt:
             unicornhathd.off()
+        except Exception as e:
+            logging.getLogger(__name__).error("Program crashed. Most likely a slide error: " + str(e))
+            print(e)
     else:
         print("No slides found. Ensure they are in /slides")
 
