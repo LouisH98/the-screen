@@ -56,10 +56,9 @@ def load_slides():
     return slides
 
 
-step = 1
-
 slides = load_slides()
-
+crash_count = 0
+max_crash_count = 5
 print("Starting Slides...")
 
 
@@ -72,10 +71,10 @@ def main():
                 for slide in slides:
                     slide = slide.plugin_object
                     slide.init(width, height)
-                    i = 0
+                    iteration = 0
                     # Break out of loop if the slide is done, or iteration limit exceeded
-                    while (not slide.done) and i <= slide.length:
-                        i += 1
+                    while (not slide.done) and iteration <= slide.length:
+                        iteration += 1
                         if time.time() - last_loop > 1:
                             print("⚡ FPS: " + str(current_frames), end='\r')
                             current_frames = 0
@@ -101,7 +100,10 @@ def main():
             unicornhathd.off()
         except Exception as e:
             logging.getLogger(__name__).error("Program crashed. Most likely a slide error: " + str(e))
-            print(e)
+            global crash_count
+            if crash_count < max_crash_count:
+                main()
+                crash_count += 1
     else:
         print("No slides found. Ensure they are in /slides")
 
