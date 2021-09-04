@@ -49,8 +49,10 @@ class WolframCA(base.BaseSlide):
         return rgb_gen
 
     def do_generation(self):
+        new_gen = [0 for _ in range(self.width)]
+#        new_gen = np.zeros(self.width, dtype=int)
         current_gen = self.current_generation
-        new_gen = np.zeros(self.width, dtype=int)
+#        np.zeros(self.width, dtype=int)
 
         for i in range(len(current_gen)):
             center = current_gen[i]

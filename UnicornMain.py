@@ -57,6 +57,7 @@ def load_slides():
 slides = load_slides()
 crash_count = 0
 max_crash_count = 5
+target_fps = 30
 print("Starting Slides...")
 
 
@@ -72,8 +73,10 @@ def main():
                     iteration = 0
                     # Break out of loop if the slide is done, or iteration limit exceeded
                     while (not slide.done) and iteration <= slide.length:
+                        begin_time = time.time()
                         iteration += 1
-                        if time.time() - last_loop > 1:
+
+                        if begin_time - last_loop > 1:
                             print("⚡ FPS: " + str(current_frames), end='\r')
                             current_frames = 0
                             last_loop = time.time()
@@ -94,6 +97,12 @@ def main():
                                     # unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                         unicornhathd.show()
                         current_frames += 1
+
+                        # check to see if we need to sleep to keep to configured FPS
+                        elapsed_seconds = time.time() - begin_time
+                        if elapsed_seconds < 1/target_fps:
+                            time.sleep(1/target_fps - elapsed_seconds)
+
         except KeyboardInterrupt:
             unicornhathd.off()
         except Exception as e:
@@ -112,7 +121,4 @@ def handlePipe(a, b):
 
 if __name__ == "__main__":
     # init screen and things
-
-    signal.signal(signal.SIGPIPE, handlePipe)
-
     main()
