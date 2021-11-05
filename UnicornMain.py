@@ -57,7 +57,7 @@ def load_slides():
 slides = load_slides()
 crash_count = 0
 max_crash_count = 5
-target_fps = 30
+target_fps = 60
 print("Starting Slides...")
 
 
