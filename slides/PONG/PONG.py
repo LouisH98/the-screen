@@ -7,6 +7,9 @@ from typing import Tuple
 import numpy
 import slides.slide as base
 
+# Globals
+max_y_speed = 1
+# Classes
 
 class GameObject(ABC):
 
@@ -48,7 +51,7 @@ class Paddle(GameObject):
         self.game = game
         self.size = 3
         self.colour = [255, 255, 255]
-        self.max_speed = 1.8
+        self.max_speed = max_y_speed
         self.center = round(game.height / 2)
 
     def update(self):
@@ -90,6 +93,7 @@ class Puck(GameObject):
         self.velocity = []
         self.colour = [255, 255, 255]
         self.reset_position_and_velocity()
+        self.max_x_speed = 1
 
     def reset_position_and_velocity(self):
         vX, vY = get_random_velocity()
@@ -112,11 +116,16 @@ class Puck(GameObject):
             self.velocity[1] = self.velocity[1] * -1
 
         # cap Y velocity to paddle max speed
-        paddle_max_speed = self.game.game_objects[1].max_speed
-        self.velocity[1] = min(self.velocity[1], paddle_max_speed)
-        self.velocity[1] = max(self.velocity[1], -paddle_max_speed)
+        self.velocity[1] = min(self.velocity[1], max_y_speed)
+        self.velocity[1] = max(self.velocity[1], -max_y_speed)
+
+        # cap X velocity
+        self.velocity[0] = min(self.velocity[0], self.max_x_speed)
+        self.velocity[0] = max(self.velocity[0], -self.max_x_speed)
+
         self.x += self.velocity[0]
         self.y += self.velocity[1]
+
 
     def draw(self):
         self.game.set_pixel(round(self.x), round(self.y), self.colour)
@@ -149,7 +158,6 @@ class Game:
 
 ###
 # PONG
-# Any live cell with fewer than two live neighbours dies, as if by underpopulation.
 # It plays itself!
 ###
 class PONG(base.BaseSlide):

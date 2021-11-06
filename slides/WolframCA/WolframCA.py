@@ -19,7 +19,9 @@ class WolframCA(base.BaseSlide):
         self.rules = [30, 90, 60, 105, 139]
         self.index = 0
         self.current_colour = 0
-
+        self.length = 350
+        self.max_fps = 30
+        
     def init(self, width, height):
         self.width = width
         self.height = height
@@ -38,7 +40,7 @@ class WolframCA(base.BaseSlide):
         rgb_gen = [[0, 0, 0] for _ in range(self.width)]
 
         r, g, b = colorsys.hsv_to_rgb(self.current_colour, 1, 1)
-        self.current_colour += 0.05
+        self.current_colour += 0.01
         if self.current_colour >= 1:
             self.current_colour = 0
 
@@ -48,8 +50,10 @@ class WolframCA(base.BaseSlide):
         return rgb_gen
 
     def do_generation(self):
+        new_gen = [0 for _ in range(self.width)]
+#        new_gen = np.zeros(self.width, dtype=int)
         current_gen = self.current_generation
-        new_gen = np.zeros(self.width, dtype=int)
+#        np.zeros(self.width, dtype=int)
 
         for i in range(len(current_gen)):
             center = current_gen[i]

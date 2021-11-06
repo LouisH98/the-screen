@@ -10,12 +10,12 @@ class BaseSlide(IPlugin):
         self.buffer = []
         self.use_pixels = True
         self.done = False
-        self.length = 250
+        self.length = 500
+        self.max_fps = 60
 
     def init(self, width, height):
         self.height = width
         self.width = height
-        self.buffer = [[Pixel() for _ in range(self.width)] for _ in range(self.height)]
 
     @classmethod
     def get_pixel(self, x, y, iter):

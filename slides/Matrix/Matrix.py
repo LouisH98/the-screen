@@ -7,7 +7,7 @@ from random import randint
 # Ported from Pimoroni Unicorn HAT example
 # https://github.com/pimoroni/unicorn-hat/blob/master/examples/hat/matrix.py
 # to Unicorn HAT HD by aburgess@gmail.com (https://github.com/Mutiny-Games)
-# to this project by louisholdsworth@gmail.com
+# to this project (with some adaptions) by louisholdsworth@gmail.com
 
 wrd_rgb = [
     [100, 255, 100], [0, 255, 0], [0, 235, 0], [0, 220, 0],
@@ -16,7 +16,10 @@ wrd_rgb = [
     [0, 80, 0], [0, 60, 0], [0, 40, 0], [0, 0, 0]
 ]
 
-blue_pilled_population = [[randint(0, 15), 15, random.uniform(0.3, 1.2)]]
+min_speed = 0.1
+max_speed = 0.6
+max_population = 10
+blue_pilled_population = [[randint(0, 15), 15, random.uniform(min_speed, max_speed)]]
 
 
 class Matrix(base.BaseSlide):
@@ -44,13 +47,14 @@ class Matrix(base.BaseSlide):
                     self.set_pixel(person[0], int(y), [rgb[0], rgb[1], rgb[2]])
                 y += 1
             person[1] -= person[2]
+
+            if person[1] < 0 - len(wrd_rgb):
+                person[1] = 15
+
         self.clock += 1
 
-        if self.clock % 5 == 0:
-            blue_pilled_population.append([randint(0, 15), 15, random.uniform(0.3, 1.2)])
-        if self.clock % 7 == 0:
-            blue_pilled_population.append([randint(0, 15), 15, random.uniform(0.3, 1.2)])
-        while len(blue_pilled_population) > 20:
-            blue_pilled_population.pop(0)
+        if len(blue_pilled_population) < max_population and self.clock % 5 == 0:
+            blue_pilled_population.append([randint(0, 15), 15, random.uniform(min_speed, max_speed)])
+
 
         return numpy.flip(self.matrix)
