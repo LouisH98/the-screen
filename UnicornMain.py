@@ -2,6 +2,7 @@
 from utils import clamp
 import logging
 import signal
+import sys
 try:
     import unicornhathd
 except ImportError:
@@ -57,7 +58,6 @@ def load_slides():
 slides = load_slides()
 crash_count = 0
 max_crash_count = 5
-target_fps = 60
 print("Starting Slides...")
 
 
@@ -71,13 +71,14 @@ def main():
                     slide = slide.plugin_object
                     slide.init(width, height)
                     iteration = 0
+                    slide_max_fps = slide.max_fps
                     # Break out of loop if the slide is done, or iteration limit exceeded
                     while (not slide.done) and iteration <= slide.length:
                         begin_time = time.time()
                         iteration += 1
 
                         if begin_time - last_loop > 1:
-                            print("⚡ FPS: " + str(current_frames), end='\r')
+                            print(f"⚡ FPS: {str(current_frames)}, Target: {slide_max_fps}" , end='\r')
                             current_frames = 0
                             last_loop = time.time()
 
@@ -100,19 +101,21 @@ def main():
 
                         # check to see if we need to sleep to keep to configured FPS
                         elapsed_seconds = time.time() - begin_time
-                        if elapsed_seconds < 1/target_fps:
-                            time.sleep(1/target_fps - elapsed_seconds)
+                        if elapsed_seconds < 1/slide_max_fps:
+                            time.sleep(1/slide_max_fps - elapsed_seconds)
 
         except KeyboardInterrupt:
             unicornhathd.off()
         except Exception as e:
-            unicornhathd.off()
             print(e)
             logging.getLogger(__name__).error("Program crashed. Most likely a slide error: " + str(e))
             global crash_count
             if crash_count < max_crash_count:
-                main()
                 crash_count += 1
+                main()
+            else: 
+                unicornhathd.off()
+                sys.exit()
     else:
         print("No slides found. Ensure they are in /slides")
 
