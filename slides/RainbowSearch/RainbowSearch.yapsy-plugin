@@ -7,6 +7,3 @@ Author = Louis Holdsworth
 Version = 0.1
 Website = louisholdsworth.co.uk
 Description = Demo for unicorn controller
-
-[Config]
-duration = 200

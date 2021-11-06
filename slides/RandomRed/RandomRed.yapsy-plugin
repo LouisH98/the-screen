@@ -1,5 +1,5 @@
 [Core]
-Name = Red Noise
+Name = RandomRed
 Module = RandomRed
 
 [Documentation]

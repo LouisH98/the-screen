@@ -4,7 +4,7 @@ from math import cos
 
 class RandomRed(base.BaseSlide):
     def get_random_colour(self, x, y, t):
-        t = t / 2
+        t = t / 5
         x = cos(t + (x + y) + x * y) + 1
         return (x - 0) / (2 - 0) * 255
 

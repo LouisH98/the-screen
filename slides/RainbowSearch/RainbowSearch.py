@@ -15,7 +15,10 @@ def rainbow_search(x, y, step):
     b = math.sin((x + ys) * scale) + math.cos((y + ys) * scale)
     return (r * 255, g * 255, b * 255)
 
-class Demo(base.BaseSlide):
+class RainbowSearch(base.BaseSlide):
+    def init(self, width, height):
+        self.length = 600
+        
     def get_pixel(self, x, y, iter):
         r, g, b = rainbow_search(x, y, iter)
         r = clamp(r)
