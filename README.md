@@ -10,6 +10,12 @@ In this repo, you'll find some slides already created:
 - Stars 
 - and a few others, taken from Unicorn Hat HD examples
 
+Slides planned:
+- Pendulum Simulation
+- Snake
+- Weather Forecase
+- Sand/Water automata
+
 ## Slides
 To create a slide, first create a folder with the slide name. Inside that folder, then create a python file with the same name, and another file with the same name, but the extension should be '.yapsy-plugin'
 
