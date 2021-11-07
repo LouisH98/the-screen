@@ -72,6 +72,7 @@ def main():
                     slide.init(width, height)
                     iteration = 0
                     slide_max_fps = slide.max_fps
+                    print("next slide")
                     # Break out of loop if the slide is done, or iteration limit exceeded
                     while (not slide.done) and iteration <= slide.length:
                         begin_time = time.time()

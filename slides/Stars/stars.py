@@ -9,7 +9,6 @@ BLUE_STAR = (50, 50, 255)
 RED_STAR = (255, 50, 50)
 
 star_count = 15
-star_speed = 0.01
 stars = []
 
 brightness_multiplier = 1.2
@@ -45,7 +44,8 @@ class StarField(base.BaseSlide):
         self.width = width
         self.height = height
         self.use_pixels = False
-        self.length = 1000
+        self.star_speed = 0.01
+
         for i in range(0, star_count):
             star = Star(get_random_start_pos(), get_random_start_pos(), 0)
             stars.append(star)
@@ -53,16 +53,16 @@ class StarField(base.BaseSlide):
     def get_buffer(self):
         self.aa.clear()
         global star_speed
-        star_speed += 0.0001
+        self.star_speed += 0.0001
         row_count = 0
         for i in range(0, star_count):
             if i % 16 * scale == 0:
                 row_count += 1
 
             stars[i] = Star(
-                stars[i].x + ((stars[i].x - 8.1 * scale) * star_speed),
-                stars[i].y + ((stars[i].y - 8.1 * scale) * star_speed),
-                stars[i].z + star_speed * 50)
+                stars[i].x + ((stars[i].x - 8.1 * scale) * self.star_speed),
+                stars[i].y + ((stars[i].y - 8.1 * scale) * self.star_speed),
+                stars[i].z + self.star_speed * 50)
 
             if stars[i].x < 0 or stars[i].y < 0 or stars[i].x > 16 * scale or stars[i].y > 16 * scale:
                 stars[i] = Star(get_random_start_pos(), get_random_start_pos(), 0)
