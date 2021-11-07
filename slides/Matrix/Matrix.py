@@ -50,6 +50,7 @@ class Matrix(base.BaseSlide):
 
             if person[1] < 0 - len(wrd_rgb):
                 person[1] = 15
+                person[0] = randint(0, 15)
 
         self.clock += 1
 
