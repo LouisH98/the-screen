@@ -1,0 +1,9 @@
+[Core]
+Name = Swirly
+Module = Swirly
+
+[Documentation]
+Author = Louis Holdsworth
+Version = 0.1
+Website = https://github.com/pimoroni/unicorn-hat-hd
+Description = Taken from UHHD examples
