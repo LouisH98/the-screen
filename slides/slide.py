@@ -17,7 +17,6 @@ class BaseSlide(IPlugin):
         self.height = width
         self.width = height
 
-    @classmethod
     def get_pixel(self, x, y, iter):
         return Pixel(x, y, 0, 0, 255)
 
