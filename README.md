@@ -13,7 +13,7 @@ In this repo, you'll find some slides already created:
 Slides planned:
 - Pendulum Simulation
 - Snake
-- Weather Forecase
+- Weather Forecast
 - Sand/Water automata
 
 ## Slides
