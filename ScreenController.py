@@ -11,6 +11,7 @@ except ImportError:
 from yapsy.PluginManager import PluginManager
 import time
 import json
+import threading 
 
 current_slide_index = 0
 
@@ -28,8 +29,7 @@ log_file_handler = logging.FileHandler('screen.log')
 log_file_handler.setLevel(logging.DEBUG)
 error_log.addHandler(log_file_handler)
 
-
-# check config for slides to load'
+# check config for slides to load
 def load_slides():
     slides = []
     with open('config.json') as config_file:
@@ -53,28 +53,43 @@ def load_slides():
                     slides.append(slide)
                     print("✔ " + slide.name)
     return slides
+    
+class ScreenController:
+    def __init__(self):
+        self.slides = load_slides()
+        self.crash_count = 0
+        self.max_crash_count = 5
+        self.current_slide_index = 0
+        self.current_slide = self.slides[self.current_slide_index]
+        self.auto_rotate = False
 
+    def next_slide(self):
+        self.current_slide_index = (self.current_slide_index + 1) % len(self.slides)
+        self.current_slide = self.slides[self.current_slide_index]
+        
 
-slides = load_slides()
-crash_count = 0
-max_crash_count = 5
-print("Starting Slides...")
+    def set_slide(self, slide_name: str):
+        slide = next((slide for slide in self.slides if slide.name == slide_name), None)
+        if slide is not None:
+            self.current_slide = slide
 
-def main():
-    last_loop = time.time()
-    current_frames = 0
-    if len(slides) > 0:
-        try:
-            while True:
-                for slide in slides:
-                    slide = slide.plugin_object
+    def start(self):
+        last_loop = time.time()
+        current_frames = 0
+        if len(self.slides) > 0:
+            try:
+                while True:
+                    if self.auto_rotate:
+                        self.next_slide()
+
+                    slide = self.current_slide.plugin_object
                     slide.init(width, height)
                     iteration = 0
 
-                    # Break out of loop if the slide is done, or iteration limit exceeded
                     while (not slide.done) and iteration <= slide.length:
                         begin_time = time.time()
                         iteration += 1
+                        
 
                         if begin_time - last_loop > 1:
                             print(f"⚡ FPS: {str(current_frames)}, Target: {slide.max_fps}" , end='\r')
@@ -93,8 +108,8 @@ def main():
                                     unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                                 else:
                                     r, g, b = buffer[x][y]
-                                    unicornhathd.set_pixel(x, y, r, g, b)
-                                    # unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
+                                    # unicornhathd.set_pixel(x, y, r, g, b)
+                                    unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                         unicornhathd.show()
                         current_frames += 1
 
@@ -102,25 +117,25 @@ def main():
                         elapsed_seconds = time.time() - begin_time
                         if elapsed_seconds < 1/slide.max_fps:
                             time.sleep(1/slide.max_fps - elapsed_seconds)
-
-        except KeyboardInterrupt:
-            unicornhathd.off()
-        except Exception as e:
-            print(e)
-            logging.getLogger(__name__).error("Program crashed. Most likely a slide error: " + str(e))
-            global crash_count
-            if crash_count < max_crash_count:
-                crash_count += 1
-                main()
-            else: 
+            except KeyboardInterrupt:
                 unicornhathd.off()
-                sys.exit()
-    else:
-        print("No slides found. Ensure they are in /slides")
+            except Exception as e:
+                print(e)
+                logging.getLogger(__name__).error("Program crashed. Most likely a slide error: " + str(e))
+                if self.crash_count < self.max_crash_count:
+                    self.crash_count += 1
+                    self.start()
+                else: 
+                    unicornhathd.off()
+                    sys.exit()
+        else:
+            print("No slides found. Ensure they are in /slides")
 
-def handlePipe(a, b):
-    print(str(a),str(b))
+
 
 if __name__ == "__main__":
     # init screen and things
-    main()
+    controller = ScreenController()
+    thread = threading.Thread(target=controller.start)
+    thread.start()
+    thread.join()
