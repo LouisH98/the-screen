@@ -66,7 +66,7 @@ class ScreenController:
     def next_slide(self):
         self.current_slide_index = (self.current_slide_index + 1) % len(self.slides)
         self.current_slide = self.slides[self.current_slide_index]
-        
+        self.current_slide.plugin_object.done = True
 
     def set_slide(self, slide_name: str):
         slide = next((slide for slide in self.slides if slide.name == slide_name), None)
@@ -89,7 +89,6 @@ class ScreenController:
                     while (not slide.done) and iteration <= slide.length:
                         begin_time = time.time()
                         iteration += 1
-                        
 
                         if begin_time - last_loop > 1:
                             print(f"⚡ FPS: {str(current_frames)}, Target: {slide.max_fps}" , end='\r')
