@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from utils import clamp
 import logging
-import signal
+from multiprocessing.connection import Client, Listener
 import sys
 try:
     import unicornhathd
@@ -35,6 +35,7 @@ def load_slides():
     with open('config.json') as config_file:
         config = json.load(config_file)
         current_brightness = config['brightness']
+        print(f"Set brightness to  {config['brightness']}")
         unicornhathd.brightness(current_brightness)
         if len(config['enabled']) == 0:
             print("👋  Loading all slides")
@@ -58,83 +59,105 @@ class ScreenController:
     def __init__(self):
         self.slides = load_slides()
         self.crash_count = 0
+        self.brightness = 0.5
         self.max_crash_count = 5
         self.current_slide_index = 0
         self.current_slide = self.slides[self.current_slide_index]
         self.auto_rotate = False
+        self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
 
+    def get_status(self):
+        return {"slide": self.current_slide.name, "brightness": self.brightness}
     def next_slide(self):
         self.current_slide_index = (self.current_slide_index + 1) % len(self.slides)
         self.current_slide = self.slides[self.current_slide_index]
-        self.current_slide.plugin_object.done = True
 
     def set_slide(self, slide_name: str):
         slide = next((slide for slide in self.slides if slide.name == slide_name), None)
         if slide is not None:
             self.current_slide = slide
 
+    def check_for_messages(self, client):
+        if client.poll(0):
+            message = client.recv()
+            print(f"Got message: {message}")
+            if message == 'next_slide':
+                self.next_slide()
+                slide_name = self.current_slide.name
+                self.parent_process.send(slide_name)
+            elif message == 'init-parent':
+                self.parent_process = self.parent_process.accept()
+            elif message == 'get_status':
+                self.parent_process.send(self.get_status())
+            return True
+        return False
+                
+
     def start(self):
         last_loop = time.time()
         current_frames = 0
         if len(self.slides) > 0:
-            try:
-                while True:
-                    if self.auto_rotate:
-                        self.next_slide()
+            with Client(('localhost', 6000), authkey=b'the-screen') as parent_conn:
+                try:
+                    while True:
+                        if self.auto_rotate:
+                            self.next_slide()
+                        
 
-                    slide = self.current_slide.plugin_object
-                    slide.init(width, height)
-                    iteration = 0
+                        slide = self.current_slide.plugin_object
+                        slide.init(width, height)
+                        iteration = 0
 
-                    while (not slide.done) and iteration <= slide.length:
-                        begin_time = time.time()
-                        iteration += 1
+                        while (not slide.done) and iteration <= slide.length:
+                            slide = self.current_slide.plugin_object
 
-                        if begin_time - last_loop > 1:
-                            print(f"⚡ FPS: {str(current_frames)}, Target: {slide.max_fps}" , end='\r')
-                            current_frames = 0
-                            last_loop = time.time()
+                            begin_time = time.time()
+                            iteration += 1
+                            
+                            # check for parent message
+                            has_message = self.check_for_messages(parent_conn)
+                            if has_message: 
+                                break
 
-                        unicornhathd.clear()
+                            if begin_time - last_loop > 1:
+                                print(f"⚡ FPS: {str(current_frames)}, Target: {slide.max_fps}" , end='\r')
+                                current_frames = 0
+                                last_loop = time.time()
 
-                        if not slide.use_pixels:
-                            buffer = slide.get_buffer()
+                            unicornhathd.clear()
 
-                        for x in range(width):
-                            for y in range(height):
-                                if slide.use_pixels:
-                                    r, g, b = slide.get_pixel(x, y, iteration)
-                                    unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
-                                else:
-                                    r, g, b = buffer[x][y]
-                                    # unicornhathd.set_pixel(x, y, r, g, b)
-                                    unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
-                        unicornhathd.show()
-                        current_frames += 1
+                            if not slide.use_pixels:
+                                buffer = slide.get_buffer()
 
-                        # check to see if we need to sleep to keep to configured FPS
-                        elapsed_seconds = time.time() - begin_time
-                        if elapsed_seconds < 1/slide.max_fps:
-                            time.sleep(1/slide.max_fps - elapsed_seconds)
-            except KeyboardInterrupt:
-                unicornhathd.off()
-            except Exception as e:
-                print(e)
-                logging.getLogger(__name__).error("Program crashed. Most likely a slide error: " + str(e))
-                if self.crash_count < self.max_crash_count:
-                    self.crash_count += 1
-                    self.start()
-                else: 
+                            for x in range(width):
+                                for y in range(height):
+                                    if slide.use_pixels:
+                                        r, g, b = slide.get_pixel(x, y, iteration)
+                                        unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
+                                    else:
+                                        r, g, b = buffer[x][y]
+                                        # unicornhathd.set_pixel(x, y, r, g, b)
+                                        unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
+                            unicornhathd.show()
+                            current_frames += 1
+
+                            # check to see if we need to sleep to keep to configured FPS
+                            elapsed_seconds = time.time() - begin_time
+                            if elapsed_seconds < 1/slide.max_fps:
+                                time.sleep(1/slide.max_fps - elapsed_seconds)
+                except KeyboardInterrupt:
                     unicornhathd.off()
-                    sys.exit()
+                except Exception as e:
+                    print(e)
+                    logging.getLogger(__name__).error("Program crashed. Most likely a slide error: " + str(e))
+                    if self.crash_count < self.max_crash_count:
+                        self.crash_count += 1
+                        self.start()
+                    else: 
+                        unicornhathd.off()
+                        sys.exit()
         else:
             print("No slides found. Ensure they are in /slides")
 
 
 
-if __name__ == "__main__":
-    # init screen and things
-    controller = ScreenController()
-    thread = threading.Thread(target=controller.start)
-    thread.start()
-    thread.join()
