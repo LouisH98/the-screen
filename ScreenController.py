@@ -68,9 +68,13 @@ class ScreenController:
 
     def get_status(self):
         return {"slide": self.current_slide.name, "brightness": self.brightness}
+    
     def next_slide(self):
         self.current_slide_index = (self.current_slide_index + 1) % len(self.slides)
         self.current_slide = self.slides[self.current_slide_index]
+    
+    def set_brightness(self, value: float):
+        unicornhathd.brightness(value)
 
     def set_slide(self, slide_name: str):
         slide = next((slide for slide in self.slides if slide.name == slide_name), None)
@@ -79,17 +83,19 @@ class ScreenController:
 
     def check_for_messages(self, client):
         if client.poll(0):
-            message = client.recv()
-            print(f"Got message: {message}")
+            message, *value = client.recv().split()
             if message == 'next_slide':
                 self.next_slide()
                 slide_name = self.current_slide.name
                 self.parent_process.send(slide_name)
+                return True
             elif message == 'init-parent':
                 self.parent_process = self.parent_process.accept()
             elif message == 'get_status':
                 self.parent_process.send(self.get_status())
-            return True
+            elif message == 'set_brightness':
+                self.set_brightness(float(value[0]))
+                self.parent_process.send(self.brightness)
         return False
                 
 
@@ -103,7 +109,6 @@ class ScreenController:
                         if self.auto_rotate:
                             self.next_slide()
                         
-
                         slide = self.current_slide.plugin_object
                         slide.init(width, height)
                         iteration = 0
@@ -115,8 +120,8 @@ class ScreenController:
                             iteration += 1
                             
                             # check for parent message
-                            has_message = self.check_for_messages(parent_conn)
-                            if has_message: 
+                            should_restart = self.check_for_messages(parent_conn)
+                            if should_restart: 
                                 break
 
                             if begin_time - last_loop > 1:
