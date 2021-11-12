@@ -27,7 +27,7 @@ def hello_world():
     new_slide = client.recv()
     return {"status": "successful", "new_slide": new_slide}
 
-@app.put('/brightness/')
+@app.put('/brightness')
 def set_brightness(value=0.5):
     try:
         value = float(value)
@@ -36,9 +36,21 @@ def set_brightness(value=0.5):
 
     if value > 1 or value < 0.1:
         return {"status": "error", "message": "Invalid parameter: value must be less than 1 and greater than 0"}
-
     client_conn.send(f'set_brightness {value}')
-    return {"status": "successful"}
+    new_brightness = client.recv()
+    return {"status": "successful", "brightness": new_brightness}
+
+@app.put('/auto-rotate')
+def set_autorotate(should_rotate: bool):
+    try:
+        value = bool(should_rotate)
+    except: 
+        return {"status": "error", "message": "Invalid parameter: must be a boolean value"}
+
+    client_conn.send(f"set_auto_rotate {value}")
+    new_value = client.recv()
+    return {"status": "successful", "rotate": new_value}
+
 
 @app.get('/status')
 def get_status():

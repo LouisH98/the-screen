@@ -74,6 +74,7 @@ class ScreenController:
         self.current_slide = self.slides[self.current_slide_index]
     
     def set_brightness(self, value: float):
+        self.brightness = value
         unicornhathd.brightness(value)
 
     def set_slide(self, slide_name: str):
@@ -82,6 +83,7 @@ class ScreenController:
             self.current_slide = slide
 
     def check_for_messages(self, client):
+        # check for messages from server process - don't wait
         if client.poll(0):
             message, *value = client.recv().split()
             if message == 'next_slide':
@@ -96,6 +98,9 @@ class ScreenController:
             elif message == 'set_brightness':
                 self.set_brightness(float(value[0]))
                 self.parent_process.send(self.brightness)
+            elif message == 'set_auto_rotate':
+                self.auto_rotate = value[0] == 'True'
+                self.parent_process.send(self.auto_rotate)
         return False
                 
 
@@ -113,7 +118,7 @@ class ScreenController:
                         slide.init(width, height)
                         iteration = 0
 
-                        while (not slide.done) and iteration <= slide.length:
+                        while not self.auto_rotate or ((not slide.done) and iteration <= slide.length):
                             slide = self.current_slide.plugin_object
 
                             begin_time = time.time()
