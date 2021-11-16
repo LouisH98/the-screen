@@ -26,7 +26,7 @@ class GameOfLife(base.BaseSlide):
         self.new_grid = []
         self.history = []
         self.length = 450
-        self.max_fps = 20
+        self.max_fps = 30
 
         # how many generations 2x repeaters are allowed to carry on for
         # game will reset after repeat_count >= max_repeat_count

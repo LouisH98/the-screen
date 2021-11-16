@@ -63,11 +63,15 @@ class ScreenController:
         self.max_crash_count = 5
         self.current_slide_index = 0
         self.current_slide = self.slides[self.current_slide_index]
-        self.auto_rotate = False
+        self.auto_rotate = True
         self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
 
     def get_status(self):
-        return {"slide": self.current_slide.name, "brightness": self.brightness}
+        return {
+                "slide": self.current_slide.name,
+                "brightness": self.brightness,
+                "auto_rotate": self.auto_rotate
+                }
     
     def next_slide(self):
         self.current_slide_index = (self.current_slide_index + 1) % len(self.slides)
@@ -89,18 +93,29 @@ class ScreenController:
             if message == 'next_slide':
                 self.next_slide()
                 slide_name = self.current_slide.name
-                self.parent_process.send(slide_name)
                 return True
+            elif message == 'get_slides':
+                slide_name_list = list(map(lambda slide: slide.name, self.slides))
+                print(slide_name_list)
+                self.parent_process.send(slide_name_list)
             elif message == 'init-parent':
                 self.parent_process = self.parent_process.accept()
             elif message == 'get_status':
                 self.parent_process.send(self.get_status())
             elif message == 'set_brightness':
                 self.set_brightness(float(value[0]))
-                self.parent_process.send(self.brightness)
             elif message == 'set_auto_rotate':
                 self.auto_rotate = value[0] == 'True'
                 self.parent_process.send(self.auto_rotate)
+            elif message == 'set_slide':
+                slide = next((slide for slide in self.slides if slide.name == value[0]), None)
+                self.auto_rotate = False
+                if slide is not None:
+                    self.current_slide = slide
+                    self.parent_process.send(slide.name)
+                    return True
+                else:
+                    self.parent_process.send(None)
         return False
                 
 
