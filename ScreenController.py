@@ -2,6 +2,7 @@
 from utils import clamp
 import logging
 from multiprocessing.connection import Client, Listener
+from contextlib import ExitStack
 import sys
 try:
     import unicornhathd
@@ -56,7 +57,7 @@ def load_slides():
     return slides
     
 class ScreenController:
-    def __init__(self):
+    def __init__(self, is_server=False):
         self.slides = load_slides()
         self.crash_count = 0
         self.brightness = 0.5
@@ -64,7 +65,9 @@ class ScreenController:
         self.current_slide_index = 0
         self.current_slide = self.slides[self.current_slide_index]
         self.auto_rotate = True
-        self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
+        self.is_server = is_server
+        if is_server:
+            self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
 
     def get_status(self):
         return {
@@ -123,7 +126,9 @@ class ScreenController:
         last_loop = time.time()
         current_frames = 0
         if len(self.slides) > 0:
-            with Client(('localhost', 6000), authkey=b'the-screen') as parent_conn:
+            with ExitStack() as stack:
+                if self.is_server:
+                    parent_conn = stack.enter_context(Client(('localhost', 6000), authkey=b'the-screen'))
                 try:
                     while True:
                         if self.auto_rotate:
@@ -139,10 +144,11 @@ class ScreenController:
                             begin_time = time.time()
                             iteration += 1
                             
-                            # check for parent message
-                            should_restart = self.check_for_messages(parent_conn)
-                            if should_restart: 
-                                break
+                            if self.is_server:
+                                # check for parent message
+                                should_restart = self.check_for_messages(parent_conn)
+                                if should_restart: 
+                                    break
 
                             if begin_time - last_loop > 1:
                                 print(f"⚡ FPS: {str(current_frames)}, Target: {slide.max_fps}" , end='\r')
@@ -184,5 +190,11 @@ class ScreenController:
         else:
             print("No slides found. Ensure they are in /slides")
 
-
+if __name__ == "__main__":
+    controller = ScreenController()
+    try:
+        controller.start()
+    except KeyboardInterrupt:
+        print("Bye!")
+        sys.exit(0)
 

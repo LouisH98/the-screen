@@ -7,7 +7,7 @@ from response_types import StatusResponse
 
 listener = multiprocessing.connection.Listener(('localhost', 6000), authkey=b'the-screen')
 
-thread = multiprocessing.Process(target=ScreenController().start)
+thread = multiprocessing.Process(target=ScreenController(is_server=True).start)
 thread.start()
 
 client_conn = listener.accept()
