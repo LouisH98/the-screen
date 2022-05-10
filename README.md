@@ -2,7 +2,7 @@
 
 Made for the [Pimoroni Unicorn Hat HD](https://shop.pimoroni.com/products/unicorn-hat-hd), this program loads "slides" and switches between them while running. Each slide can run it's own logic, with the only limitation being that each iteration, it has to return a 2D Array (the resulting pixels to be displayed.)
 
-There is also a web API (built with FastAPI) that allows remote control of 'The Screen', such as setting brighness, a specific slide, or rotation. The full list of endpoints can be found after hosting at hostname:port/docs.
+There is also a web API (built with FastAPI) that allows remote control of 'The Screen', such as setting brightness, a specific slide, or rotation. The full list of endpoints can be found after hosting at hostname:port/docs.
 
 A front-end UI is planned, but I have yet to decide on the technology.
 
