@@ -41,7 +41,7 @@ Prerequisites: Powerful enough Raspberry Pi (currently running well on a Zero 2)
 A [UnicornHatHD](https://shop.pimoroni.com/products/unicorn-hat-hd?variant=42496126730) for the display.  
 - First, clone the repository and ensure Python >3.8 is installed.
 - After this, move into 'the-screen' directory and run: `pip install -r requirements.txt`
-- Then, you should be able to
+- Then, you should be able to simply run ./start_server.sh and the animations should start!
 
 ## Slides
 To create a slide, first create a folder with the slide name. Inside that folder, then create a python file with the same name, and another file with the same name, but the extension should be '.yapsy-plugin'
