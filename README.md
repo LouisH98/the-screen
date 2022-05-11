@@ -36,8 +36,12 @@ Slides planned:
 ## API
 Since the API was built using FastAPI, documentation is generated and served on the server/docs endpoint, it also provides helpful error messages when the API is called incorrectly.
 
+## Techincal Details
+Each slide is located in the /slides directory is dynamically loaded in by Yapsy, and if no errors are present, will be automatically ran and displayed at runtime.
+I'm using python's inter-process communication to send commands from the API server process to the process running the screen, and therefore the screen process can be run without the need for the server.
+
 ## Getting Started
-Prerequisites: Powerful enough Raspberry Pi (currently running well on a Zero 2).
+Pre-requisites: Powerful enough Raspberry Pi (currently running well on a Zero 2).
 A [UnicornHatHD](https://shop.pimoroni.com/products/unicorn-hat-hd?variant=42496126730) for the display.  
 - First, clone the repository and ensure Python >3.8 is installed.
 - After this, move into 'the-screen' directory and run: `pip install -r requirements.txt`
