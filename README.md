@@ -16,7 +16,7 @@ In this repo, you'll find some slides I have already created:
 | ------------- |-------------
 | ![pong playing itself](images/pong.GIF) | ![matrix](images/matrix.GIF)
 
-| PONG (plays itself)       | Demo Shader       
+| Starfield       | Demo Shader       
 | ------------- |-------------
 | ![stars](images/stars.GIF) | ![demo](images/demo.GIF)
 
