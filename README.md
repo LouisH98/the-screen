@@ -36,7 +36,7 @@ Slides planned:
 ## API
 Since the API was built using FastAPI, documentation is generated and served on the server/docs endpoint, it also provides helpful error messages when the API is called incorrectly.
 
-## Techincal Details
+## Technical Details
 Each slide is located in the /slides directory is dynamically loaded in by Yapsy, and if no errors are present, will be automatically ran and displayed at runtime.
 I'm using python's inter-process communication to send commands from the API server process to the process running the screen, and therefore the screen process can be run without the need for the server.
 
