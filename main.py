@@ -26,10 +26,14 @@ def get_status():
     return client.recv()
 
 @app.get('/next-slide', response_model=StatusResponse)
-def hello_world():
+def next_slide():
     # ask for next slide
     client_conn.send("next_slide")
+    return get_status()
 
+@app.put('/rotation', response_model=StatusResponse)
+def set_rotation(value: int = 0):
+    client_conn.send(f"set_rotation {value}")
     return get_status()
 
 @app.put('/brightness', response_model=StatusResponse)

@@ -60,6 +60,7 @@ class ScreenController:
     def __init__(self, is_server=False):
         self.slides = load_slides()
         self.crash_count = 0
+        self.rotation = 270
         self.brightness = 0.5
         self.max_crash_count = 5
         self.current_slide_index = 0
@@ -68,14 +69,20 @@ class ScreenController:
         self.is_server = is_server
         if is_server:
             self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
+        self.set_rotation(self.rotation)
 
     def get_status(self):
         return {
                 "slide": self.current_slide.name,
                 "brightness": self.brightness,
-                "auto_rotate": self.auto_rotate
+                "auto_rotate": self.auto_rotate,
+                "rotation": self.rotation
                 }
-    
+
+    def set_rotation(self, rotation=90):
+        self.rotation = rotation
+        unicornhathd.rotation(self.rotation)
+
     def next_slide(self):
         self.current_slide_index = (self.current_slide_index + 1) % len(self.slides)
         self.current_slide = self.slides[self.current_slide_index]
@@ -107,6 +114,8 @@ class ScreenController:
                 self.parent_process.send(self.get_status())
             elif message == 'set_brightness':
                 self.set_brightness(float(value[0]))
+            elif message == 'set_rotation':
+                self.set_rotation(float(value[0]))
             elif message == 'set_auto_rotate':
                 self.auto_rotate = value[0] == 'True'
                 self.parent_process.send(self.auto_rotate)
