@@ -4,7 +4,7 @@ import './App.css';
 function App() {
   const [count, setCount] = useState(0);
   return (
-    <div className="bg-white min-h-screen dark:bg-slate-800">
+    <div className="bg-white h-screen dark:bg-stone-900">
       <button onClick={() => setCount(count + 1)}>
         Click me pls
       </button>
