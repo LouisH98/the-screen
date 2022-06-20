@@ -1,15 +1,38 @@
 import { useState } from 'react';
 import './App.css';
+import { Button, NextUIProvider, createTheme } from '@nextui-org/react';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
+import { getStatus } from './utils/ScreenAPI';
+// 2. Call `createTheme` and pass your custom values
+const lightTheme = createTheme({
+  type: 'light'
+
+})
+
+const darkTheme = createTheme({
+  type: 'dark'
+
+})
 function App() {
   const [count, setCount] = useState(0);
   return (
-    <div className="bg-white h-screen dark:bg-stone-900">
-      <button onClick={() => setCount(count + 1)}>
-        Click me pls
-      </button>
-      <h1 className="text-3xl dark:text-white font-bold underline">Hello World! {count}</h1>
+    <NextThemesProvider
+    defaultTheme="dark"
+    attribute="class"
+    value={{
+      light: lightTheme.className,
+      dark: darkTheme.className
+    }}
+  >
+  <NextUIProvider>
+    <div className="h-screen">
+    <Button onClick={getStatus}>Status</Button>
+
     </div>
+  </NextUIProvider>
+</NextThemesProvider>
+
   );
 }
 

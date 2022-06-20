@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
+
 from ScreenController import ScreenController
 import multiprocessing
 from multiprocessing.connection import Listener, Client
@@ -16,6 +18,14 @@ app = FastAPI(
         title="The Screen - API",
         version="0.0.1"
         )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 client_conn.send('init-parent')
 client = Client(('localhost', 6001), authkey=b'the-screen')
