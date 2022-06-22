@@ -13,9 +13,9 @@ export async function getStatus(): Promise<ScreenStatus> {
   return fetch(`${HOSTNAME}/status`, {
     method: "GET",
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-        }
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
   }).then((res) => res.json());
 }
 
@@ -39,42 +39,40 @@ export async function setBrightness(brightness: number): Promise<ScreenStatus> {
   }).then((res) => res.json());
 }
 
-
 /** 
 Sets the rotation of the screen
 @param rotation rotation can be: 0, 90, 180, 270 degrees
 * @throws Error  
 */
 export async function setRotation(rotation: rotations): Promise<ScreenStatus> {
-    return fetch(`${HOSTNAME}/rotations?value=${rotation}`, {
-        method: "PUT",
-      }).then((res) => res.json());
+  return fetch(`${HOSTNAME}/rotations?value=${rotation}`, {
+    method: "PUT",
+  }).then((res) => res.json());
 }
-
 
 /**
  * Moves to the next slide
  * @returns The status of The Screen after changing slide
  * @throws Error
  */
- export async function nextSlide(): Promise<ScreenStatus> {
-    return fetch(`${HOSTNAME}/next-slide`).then((res) => res.json());
-  }
-  
+export async function nextSlide(): Promise<ScreenStatus> {
+  return fetch(`${HOSTNAME}/next-slide`).then((res) => res.json());
+}
 
-  /**
+/**
  * Sets the slide to a specific one
  * @returns The status of The Screen after changing slide
  * @throws Error
  */
-   export async function setSlide(slideName: string): Promise<ScreenStatus> {
-     const response: ScreenStatus | {status: string, message: string}  = await fetch(`${HOSTNAME}/slide?slide_name=${slideName}`, {
-        method: "PUT",
-      }).then((res) => res.json());
+export async function setSlide(slideName: string): Promise<ScreenStatus> {
+  const response: ScreenStatus | { status: string; message: string } =
+    await fetch(`${HOSTNAME}/slide?slide_name=${slideName}`, {
+      method: "PUT",
+    }).then((res) => res.json());
 
-      if('status' in response && response['status'] === 'ERROR') { 
-        throw new Error(response['message']);
-      }
+  if ("status" in response && response["status"] === "ERROR") {
+    throw new Error(response["message"]);
+  }
 
-      return response as ScreenStatus;
+  return response as ScreenStatus;
 }
