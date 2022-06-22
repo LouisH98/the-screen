@@ -3,14 +3,20 @@ An API that mirrors the REST API in the Python server
 */
 import { ScreenStatus, rotations } from "./interfaces";
 
-const HOSTNAME = "http://unicorn.local:8000";
+const HOSTNAME = "http://192.168.0.57:8000";
 
 /**
  * Get the current status of The Screen
  * @returns Status of the screen, including current slide, brightness and more.
  */
 export async function getStatus(): Promise<ScreenStatus> {
-  return fetch(`${HOSTNAME}/status`).then((res) => res.json());
+  return fetch(`${HOSTNAME}/status`, {
+    method: "GET",
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+        }
+  }).then((res) => res.json());
 }
 
 /**
@@ -62,7 +68,7 @@ export async function setRotation(rotation: rotations): Promise<ScreenStatus> {
  * @throws Error
  */
    export async function setSlide(slideName: string): Promise<ScreenStatus> {
-     const response: ScreenStatus | {status: string, message: string}  = await fetch(`${HOSTNAME}/slide?value=${slideName}`, {
+     const response: ScreenStatus | {status: string, message: string}  = await fetch(`${HOSTNAME}/slide?slide_name=${slideName}`, {
         method: "PUT",
       }).then((res) => res.json());
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import './App.css';
 import { NextUIProvider, createTheme } from '@nextui-org/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import './App.css';
 
 import { getSlides, getStatus } from './utils/ScreenAPI';
 import { ScreenStatus } from './utils/interfaces';
@@ -13,26 +13,28 @@ const lightTheme = createTheme({
 })
 
 const darkTheme = createTheme({
-  type: 'dark'
-
+  type: 'dark',
+  theme: {
+    fonts: {
+      sans: "'Press Start 2P', cursive;",
+      cursive: "'Press Start 2P', cursive;"
+    }
+  }
 })
 function App() {
 
   const [status, setStatus] = useState<ScreenStatus>();
   const [slides, setSlides] = useState<string[]>([]);
 
-  async function updateStatus(){
-      setStatus(await getStatus());
+
+  async function init(){
+    setStatus(await getStatus());
+    setSlides(await getSlides());
   }
 
 
   useEffect(() => {
-    let updateSlides = async () => {
-      setSlides(await getSlides());
-    }
-
-      updateStatus();
-      updateSlides();
+    init();
   }, []);
 
   return (
@@ -45,8 +47,10 @@ function App() {
     }}
   >
   <NextUIProvider>
-    <div className="h-screen flex items-center justify-center flex-col">
-    <SetSlide allSlides={slides} currentSlide={status?.slide}/>
+    <div className="h-screen flex items-center flex-col">
+      <div id='app-wrapper' className='mt-5'>
+        <SetSlide getStatus={async () => setStatus(await getStatus())} allSlides={slides} currentSlide={status?.slide}/>
+      </div>
     </div>
   </NextUIProvider>
 </NextThemesProvider>
