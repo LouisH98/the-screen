@@ -37,11 +37,16 @@ def get_status():
 lock = threading.Lock()
 
 
-def send_message(message: str):
+def  (message: str):
     lock.acquire()
     print("acquired lock")
+    if(not client_conn):
+        lock.release()
+        return
     client_conn.send("message")
+    print("sent message")
     message = client.recv()
+    print("got message")
     lock.release()
     print("released lock")
 
