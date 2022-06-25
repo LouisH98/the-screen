@@ -37,7 +37,6 @@ def get_status():
 lock = threading.Lock()
 
 
-print("waiting?", waiting_for_response)
 def send_message(message: str):
     lock.acquire()
     client_conn.send("message")
