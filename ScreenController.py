@@ -60,7 +60,7 @@ class ScreenController:
     def __init__(self, is_server=False):
         self.slides = load_slides()
         self.crash_count = 0
-        self.rotation = 270
+        self.rotation = 90
         self.brightness = 0.5
         self.max_crash_count = 5
         self.current_slide_index = 0
