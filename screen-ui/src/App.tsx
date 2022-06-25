@@ -6,19 +6,22 @@ import "./App.css";
 import { getSlides, getStatus } from "./utils/ScreenAPI";
 import { ScreenStatus } from "./utils/interfaces";
 import { SetSlide } from "./components/SetSlide";
-// 2. Call `createTheme` and pass your custom values
+
+const theme = {
+  fonts: {
+    sans: "'Press Start 2P', cursive;",
+    cursive: "'Press Start 2P', cursive;",
+  },
+};
+
 const lightTheme = createTheme({
   type: "light",
+  theme,
 });
 
 const darkTheme = createTheme({
   type: "dark",
-  theme: {
-    fonts: {
-      sans: "'Press Start 2P', cursive;",
-      cursive: "'Press Start 2P', cursive;",
-    },
-  },
+  theme,
 });
 function App() {
   const [status, setStatus] = useState<ScreenStatus>();
@@ -29,8 +32,14 @@ function App() {
     setSlides(await getSlides());
   }
 
+  const pollingID = setInterval(async () => {
+    setStatus(await getStatus());
+  }, 2000);
+
   useEffect(() => {
     init();
+
+    return () => clearInterval(pollingID);
   }, []);
 
   return (
