@@ -129,6 +129,8 @@ class ScreenController:
                     return True
                 else:
                     self.parent_process.send(None)
+            else:
+                self.parent_process.send(None)
         return False
                 
 

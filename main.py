@@ -45,7 +45,7 @@ def send_message(message: str):
     lock.acquire()
     print("acquired lock")
     print(client_conn)
-    client_conn.send("message")
+    client_conn.send(message)
     print("sent message")
     message = client.recv()
     print("got message")
