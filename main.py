@@ -32,14 +32,24 @@ client = Client(('localhost', 6001), authkey=b'the-screen')
 print("Got client")
 
 def get_status():
-    client_conn.send('get_status')
-    return client.recv()
+    return send_message("get_status")
+
+waiting_for_response = False
+
+def send_message(message: str):
+    while(waiting_for_response):
+        continue
+        
+    waiting_for_response = True
+    client_conn.send("message")
+    message = client.recv()
+    waiting_for_response = False
+    return message
 
 @app.get('/next-slide', response_model=StatusResponse)
 def next_slide():
     # ask for next slide
-    client_conn.send("next_slide")
-    return get_status()
+    return send_message("next_slide")
 
 @app.put('/rotation', response_model=StatusResponse)
 def set_rotation(value: int = 0):
