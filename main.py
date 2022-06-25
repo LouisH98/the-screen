@@ -31,18 +31,19 @@ client_conn.send('init-parent')
 client = Client(('localhost', 6001), authkey=b'the-screen')
 print("Got client")
 
-def get_status():
-    return send_message("get_status")
+
 
 lock = threading.Lock()
 
 
-def  (message: str):
+def send_message(message: str):
+    if(not message):
+         return
+
+    print("sending message", message)
     lock.acquire()
     print("acquired lock")
-    if(not client_conn):
-        lock.release()
-        return
+    print(client_conn)
     client_conn.send("message")
     print("sent message")
     message = client.recv()
@@ -60,7 +61,7 @@ def next_slide():
 @app.put('/rotation', response_model=StatusResponse)
 def set_rotation(value: int = 0):
     client_conn.send(f"set_rotation {value}")
-    return get_status()
+    return send_message("get_status")
 
 @app.put('/brightness', response_model=StatusResponse)
 def set_brightness(value=0.5):
@@ -72,7 +73,7 @@ def set_brightness(value=0.5):
     if value > 1 or value < 0.1:
         return {"status": "error", "message": "Invalid parameter: value must be less than 1 and greater than 0"}
     client_conn.send(f'set_brightness {value}')
-    return get_status()
+    return send_message("get_status")
 
 @app.put('/auto-rotate', response_model=StatusResponse)
 def set_autorotate(rotate: bool):
@@ -83,7 +84,7 @@ def set_autorotate(rotate: bool):
 
     client_conn.send(f"set_auto_rotate {value}")
     new_value = client.recv()
-    return get_status() 
+    return send_message("get_status") 
 
 @app.get('/slides')
 def get_slides() -> List[str]:
@@ -99,8 +100,8 @@ def set_slide(slide_name: str = Query(..., min_length=1)):
     if current_slide is None:
         return {"status": "ERROR", "message": f"Slide '{slide_name}' does not exist, try again with a different name"}
 
-    return get_status() 
+    return send_message("get_status") 
 
 @app.get('/status', response_model=StatusResponse)
 def get_status_endpoint():
-    return get_status()
+    return send_message("get_status")
