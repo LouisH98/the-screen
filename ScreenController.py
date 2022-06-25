@@ -100,6 +100,7 @@ class ScreenController:
         # check for messages from server process - don't wait
         if client.poll(0):
             message, *value = client.recv().split()
+            print("got message", message, value[0])
             if message == 'next_slide':
                 self.next_slide()
                 slide_name = self.current_slide.name
