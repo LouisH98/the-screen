@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-
+import threading
 from ScreenController import ScreenController
 import multiprocessing
 from multiprocessing.connection import Listener, Client
@@ -34,16 +34,15 @@ print("Got client")
 def get_status():
     return send_message("get_status")
 
-waiting_for_response = False
+lock = threading.Lock()
 
+
+print("waiting?", waiting_for_response)
 def send_message(message: str):
-    while(waiting_for_response):
-        continue
-        
-    waiting_for_response = True
+    lock.acquire()
     client_conn.send("message")
     message = client.recv()
-    waiting_for_response = False
+    lock.release()
     return message
 
 @app.get('/next-slide', response_model=StatusResponse)
