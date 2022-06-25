@@ -39,16 +39,11 @@ def send_message(message: str):
     if(not message):
          return
 
-    print("sending message", message)
     lock.acquire()
-    print("acquired lock")
     print(client_conn)
     client_conn.send(message)
-    print("sent message")
     message = client.recv()
-    print("got message")
     lock.release()
-    print("released lock")
 
     return message
 
@@ -87,9 +82,7 @@ def set_autorotate(rotate: bool):
 
 @app.get('/slides')
 def get_slides() -> List[str]:
-    client_conn.send('get_slides')
-    slides = client.recv()
-    return slides
+    return send_message('get_slides')
 
 @app.put('/slide') 
 def set_slide(slide_name: str = Query(..., min_length=1)):
