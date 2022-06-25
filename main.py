@@ -39,9 +39,12 @@ lock = threading.Lock()
 
 def send_message(message: str):
     lock.acquire()
+    print("acquired lock")
     client_conn.send("message")
     message = client.recv()
     lock.release()
+    print("released lock")
+
     return message
 
 @app.get('/next-slide', response_model=StatusResponse)
