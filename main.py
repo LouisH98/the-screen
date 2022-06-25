@@ -34,8 +34,6 @@ print("Got client")
 
 
 lock = threading.Lock()
-lock.release()
-
 
 def send_message(message: str):
     if(not message):
