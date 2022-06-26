@@ -56,7 +56,8 @@ RETRY_TIMEOUT = 15000  # milisecond
 async def message_stream(request: Request):
     # initialise a connection to the screen
     send_message("stream")
-    with Client(('localhost', 6002), authkey=b'stream-the-screen') as stream_client:
+    print("sent message, sending client request")
+    with Client(('localhost', 6005), authkey=b'stream-the-screen') as stream_client:
         print("got")
         def new_messages():
             # Add logic here to check for new messages
