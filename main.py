@@ -59,34 +59,34 @@ async def message_stream(request: Request):
     lock.acquire()
     client_conn.send('stream')
     print("sent message, sending client request")
-    with Client(('localhost', 6005), authkey=b'stream-the-screen') as stream_client:
-        print("got")
-        lock.release()
-        def new_messages():
-            # Add logic here to check for new messages
-            # maybe screen.poll()?
-            yield stream_client.poll()
-        async def event_generator():
-            while True:
-                # If client closes connection, stop sending events
-                if await request.is_disconnected():
-                    send_message("stop_stream")
-                    break
+    stream_client =  Client(('localhost', 6005), authkey=b'stream-the-screen')
+    print("got")
+    lock.release()
+    def new_messages():
+        # Add logic here to check for new messages
+        # maybe screen.poll()?
+        yield stream_client.poll()
+    async def event_generator():
+        while True:
+            # If client closes connection, stop sending events
+            if await request.is_disconnected():
+                send_message("stop_stream")
+                break
 
-                # Checks for new messages and return them to client if any
-                if new_messages():
-                    data = stream_client.recv()
-                    print("got", data)
-                    yield {
-                            "event": "new_message",
-                            "id": "message_id",
-                            "retry": RETRY_TIMEOUT,
-                            "data": "message_content"
-                    }
+            # Checks for new messages and return them to client if any
+            if new_messages():
+                data = stream_client.recv()
+                print("got", data)
+                yield {
+                        "event": "new_message",
+                        "id": "message_id",
+                        "retry": RETRY_TIMEOUT,
+                        "data": "message_content"
+                }
 
-                await asyncio.sleep(STREAM_DELAY)
+            await asyncio.sleep(STREAM_DELAY)
 
-        return EventSourceResponse(event_generator())
+    return EventSourceResponse(event_generator())
 
 @app.get('/next-slide', response_model=StatusResponse)
 def next_slide():
