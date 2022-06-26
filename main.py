@@ -1,3 +1,4 @@
+from this import s
 from typing import List
 import multiprocessing
 from multiprocessing.connection import Listener, Client
@@ -71,6 +72,7 @@ async def message_stream(request: Request):
             # If client closes connection, stop sending events
             if await request.is_disconnected():
                 send_message("stop_stream")
+                stream_client.close()
                 break
 
             # Checks for new messages and return them to client if any
