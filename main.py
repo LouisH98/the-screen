@@ -1,11 +1,14 @@
-from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
-import threading
-from ScreenController import ScreenController
+from typing import List
 import multiprocessing
 from multiprocessing.connection import Listener, Client
-from typing import List
+import threading
+import asyncio
+from sse_starlette.sse import EventSourceResponse
+
+from fastapi import FastAPI, Query, Request
+from fastapi.middleware.cors import CORSMiddleware
 from response_types import StatusResponse
+from ScreenController import ScreenController
 
 listener = multiprocessing.connection.Listener(('localhost', 6000), authkey=b'the-screen')
 
@@ -32,10 +35,9 @@ client = Client(('localhost', 6001), authkey=b'the-screen')
 print("Got client")
 
 
-
 lock = threading.Lock()
 
-def send_message(message: str):
+def send_message(message: str) -> str:
     if(not message):
          return
 
@@ -47,6 +49,32 @@ def send_message(message: str):
 
     return message
 
+
+STREAM_DELAY = 1  # second
+RETRY_TIMEOUT = 15000  # milisecond
+@app.get('/stream')
+async def message_stream(request: Request):
+    def new_messages():
+        # Add logic here to check for new messages
+        yield 'Hello World'
+    async def event_generator():
+        while True:
+            # If client closes connection, stop sending events
+            if await request.is_disconnected():
+                break
+
+            # Checks for new messages and return them to client if any
+            if new_messages():
+                yield {
+                        "event": "new_message",
+                        "id": "message_id",
+                        "retry": RETRY_TIMEOUT,
+                        "data": "message_content"
+                }
+
+            await asyncio.sleep(STREAM_DELAY)
+
+    return EventSourceResponse(event_generator())
 @app.get('/next-slide', response_model=StatusResponse)
 def next_slide():
     # ask for next slide
