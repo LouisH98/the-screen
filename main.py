@@ -59,9 +59,7 @@ async def message_stream(request: Request):
     # initialise a connection to the screen
     lock.acquire()
     client_conn.send('stream')
-    print("sent message, sending client request")
     stream_client =  Client(('localhost', 6005), authkey=b'stream-the-screen')
-    print("got")
     lock.release()
     def new_messages():
         # Add logic here to check for new messages
@@ -71,8 +69,10 @@ async def message_stream(request: Request):
         while True:
             # If client closes connection, stop sending events
             if await request.is_disconnected():
-                send_message("stop_stream")
+                lock.acquire()
+                client_conn.send('stop_stream')
                 stream_client.close()
+                lock.release()
                 break
 
             # Checks for new messages and return them to client if any

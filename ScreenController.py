@@ -101,7 +101,6 @@ class ScreenController:
     def check_for_messages(self, client):
         # check for messages from server process - don't wait
         if client.poll(0):
-            print("before")
             message, *value = client.recv().split()
             print("got message", message, value)
             if message == 'next_slide':
