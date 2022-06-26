@@ -52,19 +52,27 @@ def send_message(message: str) -> str:
 
 STREAM_DELAY = 1  # second
 RETRY_TIMEOUT = 15000  # milisecond
-@app.get('/stream')
+@app.get('/screen/stream')
 async def message_stream(request: Request):
+    # initialise a connection to the screen
+    send_message("stream")
+    stream_client = Client(('localhost', 6002), authkey=b'stream-the-screen')
+    
     def new_messages():
         # Add logic here to check for new messages
-        yield 'Hello World'
+        # maybe screen.poll()?
+        yield stream_client.poll()
     async def event_generator():
         while True:
             # If client closes connection, stop sending events
             if await request.is_disconnected():
+                send_message("stop_stream")
                 break
 
             # Checks for new messages and return them to client if any
             if new_messages():
+                data = stream_client.recv()
+                print("got", data)
                 yield {
                         "event": "new_message",
                         "id": "message_id",

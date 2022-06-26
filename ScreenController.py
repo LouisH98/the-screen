@@ -69,6 +69,7 @@ class ScreenController:
         self.is_server = is_server
         if is_server:
             self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
+            self.stream_communication = None
         self.set_rotation(self.rotation)
 
     def get_status(self):
@@ -129,6 +130,12 @@ class ScreenController:
                     return True
                 else:
                     self.parent_process.send(None)
+            elif message == 'stream':
+                self.stream_communication = Listener(('localhost', 6002), authkey=b'stream-the-screen').accept()
+            elif message == 'stop_stream':
+                self.stream_communication.close()
+                self.stream_communication = None
+
             else:
                 self.parent_process.send(None)
         return False
@@ -171,6 +178,9 @@ class ScreenController:
 
                             if not slide.use_pixels:
                                 buffer = slide.get_buffer()
+
+                                # send to parent if streaming active
+                                self.stream_communication.send(buffer)
 
                             for x in range(width):
                                 for y in range(height):
