@@ -37,7 +37,7 @@ print("Got client")
 
 lock = threading.Lock()
 
-def send_message(message: str, release_lock=True) -> str:
+def send_message(message: str) -> str:
     if(not message):
          return
 
@@ -45,8 +45,7 @@ def send_message(message: str, release_lock=True) -> str:
     client_conn.send(message)
     message = client.recv()
 
-    if release_lock:
-        lock.release()
+    lock.release()
 
     return message
 
@@ -124,7 +123,7 @@ def get_slides() -> List[str]:
 
 @app.put('/slide') 
 def set_slide(slide_name: str = Query(..., min_length=1)):
-    current_slide = send_message(f'set_slide {slide_name}', False)
+    current_slide = send_message(f'set_slide {slide_name}')
 
     if current_slide is None:
         return {"status": "ERROR", "message": f"Slide '{slide_name}' does not exist, try again with a different name"}
