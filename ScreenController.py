@@ -203,6 +203,7 @@ class ScreenController:
                                         unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                             unicornhathd.show()
                             buffer = unicornhathd.get_pixels()
+                            self.stream_client.send(rot90(buffer, 2 + self.rotation / 90).tolist())
                             current_frames += 1
 
                             # check to see if we need to sleep to keep to configured FPS
