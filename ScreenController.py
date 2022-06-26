@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from utils import clamp
 import logging
-from numpy import rot90
+from numpy import rot90, ndarray
 from multiprocessing.connection import Client, Listener, Connection
 from contextlib import ExitStack
 import sys
@@ -71,7 +71,6 @@ class ScreenController:
         if is_server:
             self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
             self.stream_communication =  Listener(('localhost', 6005), authkey=b'stream-the-screen')
-            self.stream_client.close()
             self.stream_client = None
         self.set_rotation(self.rotation)
 
@@ -99,6 +98,17 @@ class ScreenController:
         slide = next((slide for slide in self.slides if slide.name == slide_name), None)
         if slide is not None:
             self.current_slide = slide
+
+    def send_buffer_to_server(self, buffer):
+        # send to parent if streaming active
+        if self.stream_client:
+            try:
+                if isinstance(buffer, ndarray):
+                    self.stream_client.send(rot90(buffer, 2 + self.rotation / 90).tolist())
+                else:
+                    self.stream_client.send(buffer)
+            except Exception as e:
+                print("Failed to send buffer...", e)
 
     def check_for_messages(self, client):
         # check for messages from server process - don't wait
@@ -140,6 +150,7 @@ class ScreenController:
 
             elif message == 'stop_stream':
                 print("stopping stream")
+                self.stream_client.close()
                 self.stream_client = None
 
             else:
@@ -185,30 +196,20 @@ class ScreenController:
                             if not slide.use_pixels:
                                 buffer = slide.get_buffer()
 
-                                # send to parent if streaming active
-                                if self.stream_client:
-                                    try:
-                                        self.stream_client.send(rot90(buffer, 2 + self.rotation / 90).tolist())
-                                    except:
-                                        self.stream_client.send(buffer)
-
-
                             for x in range(width):
                                 for y in range(height):
                                     if slide.use_pixels:
                                         r, g, b = slide.get_pixel(x, y, iteration)
                                         unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
+                                        buffer = unicornhathd.get_pixels()
                                     else:
                                         r, g, b = buffer[x][y]
                                         # unicornhathd.set_pixel(x, y, r, g, b)
                                         unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
+                                        
                             unicornhathd.show()
-                            buffer = unicornhathd.get_pixels()
-                            if self.stream_client:
-                                    try:
-                                        self.stream_client.send(rot90(buffer, 2 + self.rotation / 90).tolist())
-                                    except:
-                                        self.stream_client.send(buffer)
+                            
+                            self.send_buffer_to_server(buffer)
                             current_frames += 1
 
                             # check to see if we need to sleep to keep to configured FPS
