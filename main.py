@@ -1,9 +1,9 @@
-from this import s
 from typing import List
 import multiprocessing
 from multiprocessing.connection import Listener, Client
 import threading
 import asyncio
+import json
 from sse_starlette.sse import EventSourceResponse
 
 from fastapi import FastAPI, Query, Request
@@ -52,7 +52,6 @@ def send_message(message: str) -> str:
     return message
 
 
-STREAM_DELAY = 1  # second
 RETRY_TIMEOUT = 15000  # milisecond
 @app.get('/screen/stream')
 async def message_stream(request: Request):
@@ -82,10 +81,8 @@ async def message_stream(request: Request):
                         "event": "screen_data",
                         "id": "message_id",
                         "retry": RETRY_TIMEOUT,
-                        "data": data
+                        "data": json.loads(data)
                 }
-
-            # await asyncio.sleep(STREAM_DELAY)
 
     return EventSourceResponse(event_generator())
 

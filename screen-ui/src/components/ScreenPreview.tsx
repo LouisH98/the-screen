@@ -1,11 +1,9 @@
 import { useEffect } from "react";
+import { getScreenData } from "../utils/ScreenAPI";
 
 export function ScreenPreview() {
   useEffect(() => {
-    const eventSource = new EventSource("/screen/stream");
-    eventSource.addEventListener("screen_data", (event) => {
-      console.log(event.data);
-    });
+    getScreenData(console.log);
   }, []);
 
   return <div>Here!</div>;

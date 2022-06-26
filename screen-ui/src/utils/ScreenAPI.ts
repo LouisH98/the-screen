@@ -76,3 +76,8 @@ export async function setSlide(slideName: string): Promise<ScreenStatus> {
 
   return response as ScreenStatus;
 }
+
+export async function getScreenData(callback: () => void) {
+  const eventSource = new EventSource(HOSTNAME + "/screen/stream");
+  eventSource.addEventListener("screen_data", callback);
+}
