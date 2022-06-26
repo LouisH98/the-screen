@@ -185,7 +185,7 @@ class ScreenController:
 
                                 # send to parent if streaming active
                                 if self.stream_client:
-                                    self.stream_client.send(buffer)
+                                    self.stream_client.send(buffer.tolist())
 
                             for x in range(width):
                                 for y in range(height):
