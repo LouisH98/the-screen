@@ -138,7 +138,6 @@ class ScreenController:
 
             elif message == 'stop_stream':
                 print("stopping stream")
-                self.stream_communication.close()
                 self.stream_client = None
 
             else:
