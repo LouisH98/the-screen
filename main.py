@@ -78,9 +78,8 @@ async def message_stream(request: Request):
             # Checks for new messages and return them to client if any
             if new_messages():
                 data = stream_client.recv()
-                print("got", data)
                 yield {
-                        "event": "new_message",
+                        "event": "screen_data",
                         "id": "message_id",
                         "retry": RETRY_TIMEOUT,
                         "data": data

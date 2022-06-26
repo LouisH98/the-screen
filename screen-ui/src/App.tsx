@@ -6,6 +6,7 @@ import "./App.css";
 import { getSlides, getStatus } from "./utils/ScreenAPI";
 import { ScreenStatus } from "./utils/interfaces";
 import { SetSlide } from "./components/SetSlide";
+import { ScreenPreview } from "./components/ScreenPreview";
 
 const theme = {
   fonts: {
@@ -53,6 +54,7 @@ function App() {
       <NextUIProvider>
         <div className="h-screen flex items-center flex-col">
           <div id="app-wrapper" className="mt-5">
+            <ScreenPreview />
             <SetSlide
               getStatus={async () => setStatus(await getStatus())}
               allSlides={slides}
