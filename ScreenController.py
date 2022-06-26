@@ -131,7 +131,10 @@ class ScreenController:
                 else:
                     self.parent_process.send(None)
             elif message == 'stream':
+                print("waiting for connection")
                 self.stream_communication = Listener(('localhost', 6002), authkey=b'stream-the-screen').accept()
+                print("got connection")
+
             elif message == 'stop_stream':
                 self.stream_communication.close()
                 self.stream_communication = None
