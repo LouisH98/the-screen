@@ -40,12 +40,17 @@ lock = threading.Lock()
 def send_message(message: str) -> str:
     if(not message):
          return
-
     lock.acquire()
+    print("lock acquired")
+
     client_conn.send(message)
+    print("send message")
+
     message = client.recv()
+    print("got message")
 
     lock.release()
+    print("lock released")
 
     return message
 
