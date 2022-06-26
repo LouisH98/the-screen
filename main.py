@@ -55,7 +55,7 @@ RETRY_TIMEOUT = 15000  # milisecond
 @app.get('/screen/stream')
 async def message_stream(request: Request):
     # initialise a connection to the screen
-    send_message("stream")
+    # send_message("stream")
     print("sent message, sending client request")
     with Client(('localhost', 6005), authkey=b'stream-the-screen') as stream_client:
         print("got")
