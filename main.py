@@ -78,7 +78,10 @@ async def message_stream(request: Request):
                 data = stream_client.recv()
                 print("got", data)
                 yield {
-                        "screen_data":data
+                        "event": "new_message",
+                        "id": "message_id",
+                        "retry": RETRY_TIMEOUT,
+                        "data": data
                 }
 
             # await asyncio.sleep(STREAM_DELAY)
