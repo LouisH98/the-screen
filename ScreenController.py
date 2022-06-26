@@ -133,6 +133,7 @@ class ScreenController:
                     self.parent_process.send(None)
             elif message == 'stream':
                 print("waiting for connection")
+                time.sleep(1)
                 self.stream_communication = self.stream_communication.accept()
                 print("got connection")
 
