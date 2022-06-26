@@ -83,7 +83,6 @@ async def message_stream(request: Request):
                         "retry": RETRY_TIMEOUT,
                         "data": data
                 }
-            await asyncio.sleep(5/1000)
 
     return EventSourceResponse(event_generator())
 
