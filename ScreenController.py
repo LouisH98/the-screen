@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from utils import clamp
 import logging
+from numpy import rot90
 from multiprocessing.connection import Client, Listener, Connection
 from contextlib import ExitStack
 import sys
@@ -186,7 +187,7 @@ class ScreenController:
                                 # send to parent if streaming active
                                 if self.stream_client:
                                     try:
-                                        self.stream_client.send(buffer.tolist())
+                                        self.stream_client.send(rot90(buffer, self.rotation / 90).tolist())
                                     except:
                                         self.stream_client.send(buffer)
 
