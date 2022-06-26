@@ -81,7 +81,7 @@ async def message_stream(request: Request):
                         "event": "screen_data",
                         "id": "message_id",
                         "retry": RETRY_TIMEOUT,
-                        "data": json.loads(data)
+                        "data": data
                 }
 
     return EventSourceResponse(event_generator())
