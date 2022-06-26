@@ -180,7 +180,8 @@ class ScreenController:
                                 buffer = slide.get_buffer()
 
                                 # send to parent if streaming active
-                                self.stream_communication.send(buffer)
+                                if self.stream_communication is not None:
+                                    self.stream_communication.send(buffer)
 
                             for x in range(width):
                                 for y in range(height):
