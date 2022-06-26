@@ -197,6 +197,7 @@ class ScreenController:
                                         # unicornhathd.set_pixel(x, y, r, g, b)
                                         unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                             unicornhathd.show()
+                            buffer = unicornhathd.get_pixels()
                             current_frames += 1
 
                             # check to see if we need to sleep to keep to configured FPS

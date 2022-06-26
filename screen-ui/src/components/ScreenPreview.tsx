@@ -3,7 +3,9 @@ import { getScreenData } from "../utils/ScreenAPI";
 
 export function ScreenPreview() {
   useEffect(() => {
-    getScreenData(console.log);
+    getScreenData((event: MessageEvent<any>) => {
+      console.log(JSON.parse(event.data));
+    });
   }, []);
 
   return <div>Here!</div>;
