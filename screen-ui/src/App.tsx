@@ -32,14 +32,13 @@ function App() {
     setSlides(await getSlides());
   }
 
-  const pollingID = setInterval(async () => {
-    setStatus(await getStatus());
-  }, 2000);
-
   useEffect(() => {
     init();
+    const pollingID = setInterval(async () => {
+      setStatus(await getStatus());
+    }, 2000);
 
-    return () => clearInterval(pollingID);
+    return () => pollingID && clearInterval(pollingID);
   }, []);
 
   return (
