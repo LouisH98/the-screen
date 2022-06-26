@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from utils import clamp
 import logging
-from multiprocessing.connection import Client, Listener
+from multiprocessing.connection import Client, Listener, Connection
 from contextlib import ExitStack
 import sys
 try:
@@ -184,7 +184,7 @@ class ScreenController:
                                 buffer = slide.get_buffer()
 
                                 # send to parent if streaming active
-                                if self.stream_communication:
+                                if isinstance(self.stream_communication, Connection):
                                     self.stream_communication.send(buffer)
 
                             for x in range(width):
