@@ -71,6 +71,7 @@ class ScreenController:
         if is_server:
             self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
             self.stream_communication =  Listener(('localhost', 6005), authkey=b'stream-the-screen')
+            self.stream_client.close()
             self.stream_client = None
         self.set_rotation(self.rotation)
 
