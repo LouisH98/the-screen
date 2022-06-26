@@ -41,16 +41,12 @@ def send_message(message: str) -> str:
     if(not message):
          return
     lock.acquire()
-    print("lock acquired")
 
     client_conn.send(message)
-    print("send message")
 
     message = client.recv()
-    print("got message")
 
     lock.release()
-    print("lock released")
 
     return message
 
@@ -60,10 +56,12 @@ RETRY_TIMEOUT = 15000  # milisecond
 @app.get('/screen/stream')
 async def message_stream(request: Request):
     # initialise a connection to the screen
-    send_message("stream")
+    lock.acquire()
+    client_conn.send('stream')
     print("sent message, sending client request")
     with Client(('localhost', 6005), authkey=b'stream-the-screen') as stream_client:
         print("got")
+        lock.release()
         def new_messages():
             # Add logic here to check for new messages
             # maybe screen.poll()?
