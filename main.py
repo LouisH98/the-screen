@@ -42,7 +42,6 @@ def send_message(message: str) -> str:
          return
 
     lock.acquire()
-    print(client_conn)
     client_conn.send(message)
     message = client.recv()
     lock.release()
@@ -83,6 +82,7 @@ async def message_stream(request: Request):
             await asyncio.sleep(STREAM_DELAY)
 
     return EventSourceResponse(event_generator())
+    
 @app.get('/next-slide', response_model=StatusResponse)
 def next_slide():
     # ask for next slide
