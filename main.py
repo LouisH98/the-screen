@@ -37,14 +37,16 @@ print("Got client")
 
 lock = threading.Lock()
 
-def send_message(message: str) -> str:
+def send_message(message: str, release_lock=True) -> str:
     if(not message):
          return
 
     lock.acquire()
     client_conn.send(message)
     message = client.recv()
-    lock.release()
+
+    if release_lock:
+        lock.release()
 
     return message
 
@@ -82,7 +84,7 @@ async def message_stream(request: Request):
             await asyncio.sleep(STREAM_DELAY)
 
     return EventSourceResponse(event_generator())
-    
+
 @app.get('/next-slide', response_model=StatusResponse)
 def next_slide():
     # ask for next slide
@@ -122,8 +124,7 @@ def get_slides() -> List[str]:
 
 @app.put('/slide') 
 def set_slide(slide_name: str = Query(..., min_length=1)):
-    client_conn.send(f'set_slide {slide_name}')
-    current_slide = client.recv()
+    current_slide = send_message(f'set_slide {slide_name}', False)
 
     if current_slide is None:
         return {"status": "ERROR", "message": f"Slide '{slide_name}' does not exist, try again with a different name"}
