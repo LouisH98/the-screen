@@ -36,18 +36,18 @@ client = Client(('localhost', 6001), authkey=b'the-screen')
 print("Got client")
 
 
-lock = threading.Lock()
+communication_lock = threading.Lock()
 
 def send_message(message: str) -> str:
     if(not message):
          return
-    lock.acquire()
+    communication_lock.acquire()
 
     client_conn.send(message)
 
     message = client.recv()
 
-    lock.release()
+    communication_lock.release()
 
     return message
 
@@ -56,10 +56,10 @@ RETRY_TIMEOUT = 15000  # milisecond
 @app.get('/screen/stream')
 async def message_stream(request: Request):
     # initialise a connection to the screen
-    lock.acquire()
+    communication_lock.acquire()
     client_conn.send('stream')
     stream_client =  Client(('localhost', 6005), authkey=b'stream-the-screen')
-    lock.release()
+    communication_lock.release()
     def new_messages():
         # Add logic here to check for new messages
         # maybe screen.poll()?
@@ -68,10 +68,10 @@ async def message_stream(request: Request):
         while True:
             # If client closes connection, stop sending events
             if await request.is_disconnected():
-                lock.acquire()
+                communication_lock.acquire()
                 client_conn.send('stop_stream')
                 stream_client.close()
-                lock.release()
+                communication_lock.release()
                 break
 
             # Checks for new messages and return them to client if any
@@ -83,6 +83,7 @@ async def message_stream(request: Request):
                         "retry": RETRY_TIMEOUT,
                         "data": data
                 }
+            await asyncio.sleep(5/1000)
 
     return EventSourceResponse(event_generator())
 
