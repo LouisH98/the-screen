@@ -187,7 +187,7 @@ class ScreenController:
                                 # send to parent if streaming active
                                 if self.stream_client:
                                     try:
-                                        self.stream_client.send(rot90(2 + buffer, self.rotation / 90).tolist())
+                                        self.stream_client.send(rot90(buffer, 2 + self.rotation / 90).tolist())
                                     except:
                                         self.stream_client.send(buffer)
 
