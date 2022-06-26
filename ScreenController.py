@@ -183,9 +183,9 @@ class ScreenController:
                             if not slide.use_pixels:
                                 buffer = slide.get_buffer()
 
-                                # # send to parent if streaming active
-                                # if self.stream_communication is not None:
-                                #     self.stream_communication.send(buffer)
+                                # send to parent if streaming active
+                                if self.stream_communication.last_accepted:
+                                    self.stream_communication.send(buffer)
 
                             for x in range(width):
                                 for y in range(height):
