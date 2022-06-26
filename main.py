@@ -37,11 +37,11 @@ print("Got client")
 
 
 communication_lock = threading.Lock()
-streaming_lock = threading.Lock()
 
 def send_message(message: str) -> str:
     if(not message):
          return
+
     communication_lock.acquire()
 
     client_conn.send(message)
@@ -52,7 +52,6 @@ def send_message(message: str) -> str:
 
     return message
 
-STEAM_DATA = []
 
 RETRY_TIMEOUT = 15000  # milisecond
 @app.get('/screen/stream')
@@ -66,7 +65,6 @@ async def message_stream(request: Request):
         yield stream_client.poll()
     async def event_generator():
         while True:
-
             # If client closes connection, stop sending events
             if await request.is_disconnected():
                 communication_lock.acquire()
@@ -77,17 +75,13 @@ async def message_stream(request: Request):
 
             # Checks for new messages and return them to client if any
             if new_messages():
-                if not streaming_lock.locked():
-                    global STEAM_DATA
-                    streaming_lock.acquire()
-                    STEAM_DATA = stream_client.recv()
-                    streaming_lock.release()
-                    
+                data = stream_client.recv()
+            
                 yield {
                         "event": "screen_data",
                         "id": "message_id",
                         "retry": RETRY_TIMEOUT,
-                        "data": STEAM_DATA
+                        "data": data
                 }
 
     return EventSourceResponse(event_generator())
