@@ -70,6 +70,7 @@ class ScreenController:
         if is_server:
             self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
             self.stream_communication =  Listener(('localhost', 6005), authkey=b'stream-the-screen')
+            self.stream_client = None
         self.set_rotation(self.rotation)
 
     def get_status(self):
@@ -133,12 +134,13 @@ class ScreenController:
                     self.parent_process.send(None)
             elif message == 'stream':
                 print("waiting for connection")
-                self.stream_communication = self.stream_communication.accept()
+                self.stream_client = self.stream_communication.accept()
                 print("got connection")
 
             elif message == 'stop_stream':
                 print("stopping stream")
-                self.stream_communication = Listener(('localhost', 6005), authkey=b'stream-the-screen')
+                self.stream_communication.close()
+                self.stream_client = None
 
             else:
                 self.parent_process.send(None)
@@ -184,8 +186,8 @@ class ScreenController:
                                 buffer = slide.get_buffer()
 
                                 # send to parent if streaming active
-                                if isinstance(self.stream_communication, Connection):
-                                    self.stream_communication.send(buffer)
+                                if self.stream_client:
+                                    self.stream_client.send(buffer)
 
                             for x in range(width):
                                 for y in range(height):
