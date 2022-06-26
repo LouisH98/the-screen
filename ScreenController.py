@@ -69,7 +69,7 @@ class ScreenController:
         self.is_server = is_server
         if is_server:
             self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
-            # self.stream_communication =  Listener(('localhost', 6002), authkey=b'stream-the-screen')
+            self.stream_communication =  Listener(('localhost', 6002), authkey=b'stream-the-screen')
         self.set_rotation(self.rotation)
 
     def get_status(self):
@@ -131,13 +131,14 @@ class ScreenController:
                     return True
                 else:
                     self.parent_process.send(None)
-            # elif message == 'stream':
-            #     print("waiting for connection")
-            #     self.stream_communication = self.stream_communication.accept()
-            #     print("got connection")
+            elif message == 'stream':
+                print("waiting for connection")
+                self.stream_communication = self.stream_communication.accept()
+                print("got connection")
 
-            # elif message == 'stop_stream':
-            #     self.stream_communication = Listener(('localhost', 6002), authkey=b'stream-the-screen')
+            elif message == 'stop_stream':
+                print("stopping stream")
+                self.stream_communication = Listener(('localhost', 6002), authkey=b'stream-the-screen')
 
             else:
                 self.parent_process.send(None)
