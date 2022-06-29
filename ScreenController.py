@@ -116,14 +116,12 @@ class ScreenController:
         # check for messages from server process - don't wait
         if client.poll(0):
             message, *value = client.recv().split()
-            print("got message", message, value)
             if message == 'next_slide':
                 self.next_slide()
                 slide_name = self.current_slide.name
                 return True
             elif message == 'get_slides':
                 slide_name_list = list(map(lambda slide: slide.name, self.slides))
-                print(slide_name_list)
                 self.parent_process.send(slide_name_list)
             elif message == 'init-parent':
                 self.parent_process = self.parent_process.accept()
@@ -146,15 +144,10 @@ class ScreenController:
                 else:
                     self.parent_process.send(None)
             elif message == 'stream':
-                print("waiting for connection")
                 self.stream_client = self.stream_communication.accept()
-                print("got connection")
-
             elif message == 'stop_stream':
-                print("stopping stream")
                 self.stream_client.close()
                 self.stream_client = None
-
             else:
                 self.parent_process.send(None)
         return False
