@@ -10,6 +10,8 @@ try:
 except ImportError:
     from unicorn_hat_sim import unicornhathd
 
+from sense_utils.SenseHelpers import get_rotation
+
 from yapsy.PluginManager import PluginManager
 import time
 import json
@@ -180,6 +182,8 @@ class ScreenController:
                             begin_time = time.time()
                             iteration += 1
                             
+                            self.rotation = get_rotation()
+                            
                             if self.is_server:
                                 # check for parent message
                                 should_restart = self.check_for_messages(parent_conn)
@@ -187,9 +191,14 @@ class ScreenController:
                                     break
 
                             if begin_time - last_loop > 1:
-                                print(f"⚡ FPS: {str(current_frames)}, Target: {slide.max_fps}" , end='\r')
+                                
+                                print(
+                                    f"⚡ FPS: {str(current_frames)}, Target: {slide.max_fps}", end='\r')
                                 current_frames = 0
                                 last_loop = time.time()
+                                
+                                self.set_rotation(self.rotation)
+
 
                             unicornhathd.clear()
 
@@ -207,6 +216,8 @@ class ScreenController:
                                         # unicornhathd.set_pixel(x, y, r, g, b)
                                         unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                                         
+
+
                             unicornhathd.show()
                             
                             self.send_buffer_to_server(buffer)
