@@ -1,0 +1,3 @@
+[submodule "slides/cmr-rpi-metrics-vis"]
+	path = slides/CMRMetricsVis
+	url = git@gitlab.com:cmr-surgical/customer-operations/proof-of-concept/louis-h/cmr-rpi-metrics-vis.git

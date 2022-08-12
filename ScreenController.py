@@ -212,8 +212,8 @@ class ScreenController:
 
 
                             unicornhathd.show()
-                            
-                            self.send_buffer_to_server(buffer)
+                            if self.is_server:
+                                self.send_buffer_to_server(buffer)
                             current_frames += 1
 
                             # check to see if we need to sleep to keep to configured FPS
