@@ -1,0 +1,9 @@
+[Core]
+Name = ChristmasTree
+Module = ChristmasTree
+
+[Documentation]
+Author = Louis Holdsworth
+Version = 0.1
+Website = louisholdsworth.co.uk
+Description = How very festive

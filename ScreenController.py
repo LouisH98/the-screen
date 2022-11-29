@@ -5,17 +5,22 @@ from numpy import rot90, ndarray
 from multiprocessing.connection import Client, Listener, Connection
 from contextlib import ExitStack
 import sys
+
 try:
     import unicornhathd
 except ImportError:
     from unicorn_hat_sim import unicornhathd
 
-from sense_utils.SenseHelpers import get_rotation
+HAS_ACCEL = True
+try:
+    from sense_utils.SenseHelpers import get_rotation
+except ModuleNotFoundError:
+    print("couldn't find sense hat lib - disabling functionality")
+    HAS_ACCEL = False
 
 from yapsy.PluginManager import PluginManager
 import time
 import json
-import threading 
 
 current_slide_index = 0
 
@@ -58,18 +63,20 @@ def load_slides():
                     slides.append(slide)
                     print("✔ " + slide.name)
     return slides
-    
+
+
 class ScreenController:
     def __init__(self, is_server=False):
         self.slides = load_slides()
         self.crash_count = 0
-        self.rotation = 90
+        self.rotation = 0
         self.brightness = 0.5
         self.max_crash_count = 5
         self.current_slide_index = 0
         self.current_slide = self.slides[self.current_slide_index]
         self.auto_rotate = True
         self.is_server = is_server
+        self.use_accelerometer = HAS_ACCEL
         if is_server:
             self.parent_process = Listener(('localhost', 6001), authkey=b'the-screen')
             self.stream_communication =  Listener(('localhost', 6005), authkey=b'stream-the-screen')
@@ -175,12 +182,13 @@ class ScreenController:
                             begin_time = time.time()
                             iteration += 1
                             
-                            self.rotation = get_rotation()
+                            if self.use_accelerometer:
+                                self.rotation = get_rotation()
                             
                             if self.is_server:
                                 # check for parent message
                                 should_restart = self.check_for_messages(parent_conn)
-                                if should_restart: 
+                                if should_restart:
                                     break
 
                             if begin_time - last_loop > 1:
@@ -206,7 +214,6 @@ class ScreenController:
                                         buffer = unicornhathd.get_pixels()
                                     else:
                                         r, g, b = buffer[x][y]
-                                        # unicornhathd.set_pixel(x, y, r, g, b)
                                         unicornhathd.set_pixel(x, y, clamp(r), clamp(g), clamp(b))
                                         
 
@@ -234,11 +241,14 @@ class ScreenController:
         else:
             print("No slides found. Ensure they are in /slides")
 
-if __name__ == "__main__":
+def main():
     controller = ScreenController()
     try:
         controller.start()
     except KeyboardInterrupt:
         print("Bye!")
         sys.exit(0)
+
+if __name__ == "__main__":
+    main()
 
